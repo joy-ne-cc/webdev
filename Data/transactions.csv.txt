@@ -1,2 +1,0 @@
-TransactionID,MobileBooth,Location,Service,RevenuePerKwanch,TransactionAmount
-WB0000001,Wina1,Lusaka CPD,Airtel Money,0.05,964
