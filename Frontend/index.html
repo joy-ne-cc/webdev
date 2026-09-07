@@ -1,1 +1,119 @@
-Hello
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wina Bwangu — Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-shell">
+
+    <!-- ============ NAVIGATION ============ -->
+    <nav class="sidenav" aria-label="Main navigation">
+      <div class="sidenav-brand">
+        <span class="sidenav-brand-mark">WB</span>
+        <span class="sidenav-brand-name">Wina Bwangu</span>
+      </div>
+      <ul class="sidenav-links">
+        <li><a href="index.html" class="sidenav-link">New Transaction</a></li>
+        <li><a href="dashboard.html" class="sidenav-link sidenav-link--active" aria-current="page">Dashboard</a></li>
+      </ul>
+    </nav>
+
+    <!-- ============ MAIN CONTENT ============ -->
+    <div class="main-column">
+
+      <header class="page-header">
+        <h1>Operations Dashboard</h1>
+        <p class="page-subtitle">February 2021 — mobile booth performance</p>
+      </header>
+
+      <main class="dashboard-grid">
+
+        <!-- Item 9: summary cards -->
+        <section class="summary-cards" aria-label="Summary totals">
+          <div class="summary-card">
+            <span class="summary-card-label">Total Revenue</span>
+            <span class="summary-card-value" id="total-revenue">—</span>
+          </div>
+          <div class="summary-card">
+            <span class="summary-card-label">Total Capital</span>
+            <span class="summary-card-value" id="total-capital">—</span>
+          </div>
+        </section>
+
+        <!-- Item 6: service limits, cumulative totals, remaining credit -->
+        <section class="panel panel--wide" aria-labelledby="service-limits-heading">
+          <h2 id="service-limits-heading">Service Limits &amp; Remaining Credit</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Monthly Limit</th>
+                <th>Cumulative Total</th>
+                <th>Remaining</th>
+                <th>Limit Used</th>
+              </tr>
+            </thead>
+            <tbody id="service-limits-body">
+              <!-- populated by dashboard.js -->
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Item 7: booth revenue -->
+        <section class="panel" aria-labelledby="booth-revenue-heading">
+          <h2 id="booth-revenue-heading">Revenue by Booth</h2>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Booth</th>
+                <th>Location</th>
+                <th>Cumulative Revenue</th>
+              </tr>
+            </thead>
+            <tbody id="booth-revenue-body">
+              <!-- populated by dashboard.js -->
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Item 10: pie chart of summary totals -->
+        <section class="panel" aria-labelledby="summary-pie-heading">
+          <h2 id="summary-pie-heading">Revenue vs Capital</h2>
+          <div class="pie-wrap">
+            <div class="pie-chart" id="summary-pie" role="img" aria-label="Pie chart of total revenue versus total capital"></div>
+            <div class="pie-legend" id="pie-legend">
+              <!-- populated by dashboard.js -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Item 8: service frequency per booth -->
+        <section class="panel panel--wide" aria-labelledby="frequency-heading">
+          <h2 id="frequency-heading">Service Frequency by Booth</h2>
+          <div class="table-scroll">
+            <table class="data-table frequency-table" id="frequency-table">
+              <!-- head + body populated by dashboard.js -->
+            </table>
+          </div>
+        </section>
+
+        <!-- Tax obligation performance -->
+        <section class="panel panel--wide" aria-labelledby="tax-heading">
+          <h2 id="tax-heading">Tax Obligation Performance</h2>
+          <div class="tax-list" id="tax-obligations">
+            <!-- populated by dashboard.js -->
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
