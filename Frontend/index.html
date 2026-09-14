@@ -3,46 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wina Bwangu - Transaction Form</title>
+    <title>Wina Bwangu - Financial Operations Portal</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Chart.js Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Wina Bwangu Transaction Form</h1>
+    <div class="app-container">
+        <!-- Professional Header -->
+        <header class="app-header">
+            <div class="brand">
+                <h1>WINA BWANGU</h1>
+                <span class="badge-sub">Enterprise Portal</span>
+            </div>
+            <p class="header-desc">Mobile Transaction & Financial Analytics Operations Management System</p>
+        </header>
 
-        <form id="transactionForm">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab('formTab')">Transaction Entry</button>
+            <button class="tab-btn" onclick="switchTab('dashboardTab')">Financial Analytics</button>
+        </nav>
 
-            <label for="transactionID">Transaction ID:</label>
-            <input type="text" id="transactionID" name="transactionID" placeholder="Auto-generated later" readonly>
+        <!-- TAB 1: TRANSACTION FORM -->
+        <main id="formTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Record Agent Transaction</h2>
+                    <p>Enter the details below to process and register a booth transaction.</p>
+                </div>
+                
+                <div id="formMessage"></div>
+                
+                <form id="transactionForm">
+                    <div class="form-group">
+                        <label for="transactionID">Transaction Reference</label>
+                        <input type="text" id="transactionID" name="transactionID" placeholder="Auto-generated (e.g., WB0000309)" readonly>
+                    </div>
 
-            <label for="booth">Mobile Booth:</label>
-            <select id="booth" name="booth" required>
-                <option value="">Select Booth</option>
-                <option value="Wina1">Wina1</option>
-                <option value="Wina2">Wina2</option>
-                <option value="Wina3">Wina3</option>
-                <option value="Wina4">Wina4</option>
-                <option value="Wina5">Wina5</option>
-                <option value="Wina6">Wina6</option>
-            </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="booth">Mobile Booth</label>
+                            <select id="booth" name="booth" required>
+                                <option value="">Select Booth</option>
+                                <option value="Wina1">Wina1</option>
+                                <option value="Wina2">Wina2</option>
+                                <option value="Wina3">Wina3</option>
+                                <option value="Wina4">Wina4</option>
+                                <option value="Wina5">Wina5</option>
+                                <option value="Wina6">Wina6</option>
+                            </select>
+                        </div>
 
-            <label for="location">Location:</label>
-            <input type="text" id="location" name="location" readonly placeholder="Location will appear here">
+                        <div class="form-group">
+                            <label for="location">Location</label>
+                            <input type="text" id="location" name="location" readonly placeholder="Auto-populates from selection">
+                        </div>
+                    </div>
 
-            <label for="service">Service:</label>
-            <select id="service" name="service" required>
-                <option value="">Select Service</option>
-            </select>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="service">Service Network</label>
+                            <select id="service" name="service" required>
+                                <option value="">Select Service</option>
+                            </select>
+                        </div>
 
-            <label for="revenue">Revenue per Kwacha:</label>
-            <input type="text" id="revenue" name="revenue" readonly placeholder="Select a service">
+                        <div class="form-group">
+                            <label for="revenue">Revenue Rate per Kwacha</label>
+                            <input type="text" id="revenue" name="revenue" readonly placeholder="Auto-populates rate">
+                        </div>
+                    </div>
 
-            <label for="amount">Transaction Amount (ZMW):</label>
-            <input type="number" id="amount" name="amount" required min="1" step="0.01" placeholder="Enter amount">
+                    <div class="form-group">
+                        <label for="amount">Transaction Amount (ZMW)</label>
+                        <input type="number" id="amount" name="amount" required min="1" step="0.01" placeholder="0.00">
+                    </div>
 
-            <button type="submit">Submit Transaction</button>
-        </form>
+                    <button type="submit" class="btn-primary">Process Transaction</button>
+                </form>
+            </div>
+        </main>
+
+        <!-- TAB 2: DASHBOARD INTERFACE -->
+        <main id="dashboardTab" class="tab-content" style="display: none;">
+            <div class="dashboard-grid">
+                <!-- Pie Chart Card -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h2>Revenue vs. Capital Float Distribution</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenuePieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Service Metrics Card -->
+                <div class="card table-card">
+                    <div class="card-header">
+                        <h2>Service Credit Limits & Activity</h2>
+                    </div>
+                    <table class="data-table" id="serviceTable">
+                        <thead>
+                            <tr>
+                                <th>Service Name</th>
+                                <th>Monthly Limit</th>
+                                <th>Cumulative Total</th>
+                                <th>Remaining Limit</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 
     <script src="script.js"></script>
