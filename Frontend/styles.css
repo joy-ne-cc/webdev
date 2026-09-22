@@ -279,8 +279,76 @@ h1, h2 { color: var(--color-ink); margin: 0; }
 
 /* ---------- SECTION 3: Index / transaction form (TJ) ---------- */
 
-/* Add form, dropdown, and revenue-display styles here to keep one
-   shared file rather than a second stylesheet. */
+.form-panel {
+  max-width: 580px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-panel);
+  font-size: 0.95rem;
+  background: var(--color-surface);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.form-input[readonly] {
+  background: var(--color-paper);
+  color: var(--color-ink-soft);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: var(--radius-panel);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: var(--radius-panel);
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+}
+
+.alert-success {
+  background-color: #e6f4ea;
+  color: #137333;
+  border: 1px solid #ceead6;
+}
+
+.alert-danger {
+  background-color: #fce8e6;
+  color: #c5221f;
+  border: 1px solid #fad2cf;
+}
 
 /* ---------- SECTION 4: Responsive ---------- */
 
