@@ -1,125 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wina Bwangu - Financial Operations Portal</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Chart.js Engine -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wina Bwangu — New Transaction</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div class="app-container">
-        <!-- Professional Header -->
-        <header class="app-header">
-            <div class="brand">
-                <h1>WINA BWANGU</h1>
-                <span class="badge-sub">Enterprise Portal</span>
+  <div class="app-shell">
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidenav" aria-label="Main navigation">
+      <div class="sidenav-brand">
+        <span class="sidenav-brand-mark">WB</span>
+        <span class="sidenav-brand-name">Wina Bwangu</span>
+      </div>
+      <ul class="sidenav-links">
+        <li><a href="index.html" class="sidenav-link sidenav-link--active" aria-current="page">New Transaction</a></li>
+        <li><a href="dashboard.html" class="sidenav-link">Dashboard</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-column">
+
+      <header class="page-header">
+        <h1>Record New Transaction</h1>
+        <p class="page-subtitle">Select mobile booth and service to process transaction</p>
+      </header>
+
+      <main>
+        <div id="formMessage"></div>
+
+        <section class="panel form-panel">
+          <form id="transactionForm">
+
+            <!-- Mobile Booth Dropdown -->
+            <div class="form-group">
+              <label for="booth">Mobile Booth</label>
+              <select id="booth" class="form-input" required>
+                <option value="">-- Select Mobile Booth --</option>
+                <option value="Wina1">Wina1 (Lusaka CPD)</option>
+                <option value="Wina2">Wina2 (Libala)</option>
+                <option value="Wina3">Wina3 (Kabwata)</option>
+                <option value="Wina4">Wina4 (Mandevu)</option>
+                <option value="Wina5">Wina5 (Woodlands)</option>
+                <option value="Wina6">Wina6 (Matero East)</option>
+              </select>
             </div>
-            <p class="header-desc">Mobile Transaction & Financial Analytics Operations Management System</p>
-        </header>
 
-        <!-- Navigation Tabs -->
-        <nav class="nav-tabs">
-            <button class="tab-btn active" onclick="switchTab('formTab')">Transaction Entry</button>
-            <button class="tab-btn" onclick="switchTab('dashboardTab')">Financial Analytics</button>
-        </nav>
-
-        <!-- TAB 1: TRANSACTION FORM -->
-        <main id="formTab" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Record Agent Transaction</h2>
-                    <p>Enter the details below to process and register a booth transaction.</p>
-                </div>
-                
-                <div id="formMessage"></div>
-                
-                <form id="transactionForm">
-                    <div class="form-group">
-                        <label for="transactionID">Transaction Reference</label>
-                        <input type="text" id="transactionID" name="transactionID" placeholder="Auto-generated (e.g., WB0000309)" readonly>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="booth">Mobile Booth</label>
-                            <select id="booth" name="booth" required>
-                                <option value="">Select Booth</option>
-                                <option value="Wina1">Wina1</option>
-                                <option value="Wina2">Wina2</option>
-                                <option value="Wina3">Wina3</option>
-                                <option value="Wina4">Wina4</option>
-                                <option value="Wina5">Wina5</option>
-                                <option value="Wina6">Wina6</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="location">Location</label>
-                            <input type="text" id="location" name="location" readonly placeholder="Auto-populates from selection">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="service">Service Network</label>
-                            <select id="service" name="service" required>
-                                <option value="">Select Service</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="revenue">Revenue Rate per Kwacha</label>
-                            <input type="text" id="revenue" name="revenue" readonly placeholder="Auto-populates rate">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="amount">Transaction Amount (ZMW)</label>
-                        <input type="number" id="amount" name="amount" required min="1" step="0.01" placeholder="0.00">
-                    </div>
-
-                    <button type="submit" class="btn-primary">Process Transaction</button>
-                </form>
+            <!-- Location (Auto-populated) -->
+            <div class="form-group">
+              <label for="location">Location</label>
+              <input type="text" id="location" class="form-input" readonly placeholder="Auto-populated on selection">
             </div>
-        </main>
 
-        <!-- TAB 2: DASHBOARD INTERFACE -->
-        <main id="dashboardTab" class="tab-content" style="display: none;">
-            <div class="dashboard-grid">
-                <!-- Pie Chart Card -->
-                <div class="card chart-card">
-                    <div class="card-header">
-                        <h2>Revenue vs. Capital Float Distribution</h2>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="revenuePieChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Service Metrics Card -->
-                <div class="card table-card">
-                    <div class="card-header">
-                        <h2>Service Credit Limits & Activity</h2>
-                    </div>
-                    <table class="data-table" id="serviceTable">
-                        <thead>
-                            <tr>
-                                <th>Service Name</th>
-                                <th>Monthly Limit</th>
-                                <th>Cumulative Total</th>
-                                <th>Remaining Limit</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
+            <!-- Cascading Service Dropdown -->
+            <div class="form-group">
+              <label for="service">Service Offered</label>
+              <select id="service" class="form-input" required>
+                <option value="">-- Select Booth First --</option>
+              </select>
             </div>
-        </main>
+
+            <!-- Revenue Rate (Auto-populated) -->
+            <div class="form-group">
+              <label for="revenue">Revenue Per Kwacha</label>
+              <input type="text" id="revenue" class="form-input" readonly placeholder="0.00">
+            </div>
+
+            <!-- Transaction Amount -->
+            <div class="form-group">
+              <label for="amount">Transaction Amount (ZMW)</label>
+              <input type="number" id="amount" class="form-input" min="1" step="any" placeholder="Enter amount" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Submit Transaction</button>
+          </form>
+        </section>
+      </main>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
