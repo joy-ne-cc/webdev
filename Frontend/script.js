@@ -1,6 +1,5 @@
 // API Base Endpoint
 const API_BASE = "http://127.0.0.1:5000/api";
-let chartInstance = null;
 
 // Mapping Data
 const boothLocations = {
@@ -121,76 +120,9 @@ document.addEventListener("DOMContentLoaded", function () {
                     msgElement.textContent = `Error: ${data.error || 'Failed to process transaction.'}`;
                 }
             } catch (err) {
-                // Fallback display if backend is offline
                 msgElement.className = "alert alert-danger";
                 msgElement.textContent = "Could not reach the server. Please check that the backend is running and try again.";
             }
         });
     }
 });
-
-// Tab Switching Navigation
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
-    document.getElementById(tabId).style.display = 'block';
-    event.currentTarget.classList.add('active');
-
-    if (tabId === 'dashboardTab') {
-        loadDashboardData();
-    }
-}
-
-// Analytics Dashboard Chart and Summary Table Loader
-async function loadDashboardData() {
-    try {
-        const pieRes = await fetch(`${API_BASE}/dashboard/pie`);
-        const pieData = await pieRes.json();
-        renderPieChart(pieData.labels, pieData.values);
-
-        const sRes = await fetch(`${API_BASE}/dashboard/service-summary`);
-        const services = await sRes.json();
-        const sBody = document.querySelector("#serviceTable tbody");
-        if (sBody) {
-            sBody.innerHTML = services.map(s => `
-                <tr>
-                    <td><strong>${s.service}</strong></td>
-                    <td>ZMW ${s.monthly_limit.toLocaleString()}</td>
-                    <td>ZMW ${s.cumulative_total.toLocaleString()}</td>
-                    <td>ZMW ${s.amount_remaining.toLocaleString()}</td>
-                </tr>
-            `).join("");
-        }
-    } catch (err) {
-        // Fallback chart rendering for demonstration
-        renderPieChart(["Total Revenue", "Total Capital Float"], [32033.70, 740000.00]);
-    }
-}
-
-function renderPieChart(labels, values) {
-    const canvas = document.getElementById("revenuePieChart");
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    
-    if (chartInstance) chartInstance.destroy();
-
-    chartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: values,
-                backgroundColor: ['#2563eb', '#64748b'],
-                borderWidth: 1,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'bottom' }
-            }
-        }
-    });
-}
