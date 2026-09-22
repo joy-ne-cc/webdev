@@ -152,8 +152,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     msgElement.textContent = `Error: ${data.error || 'Failed to process transaction.'}`;
                 }
             } catch (err) {
-                msgElement.className = "alert alert-success";
-                msgElement.innerHTML = `Transaction recorded locally. Reference ID: <strong>WB0000309</strong>`;
+                msgElement.className = "alert alert-danger";
+                msgElement.textContent = "Could not reach the server. Please check that the backend is running and try again.";
             } finally {
                 if (submitBtn) submitBtn.disabled = false;
             }
