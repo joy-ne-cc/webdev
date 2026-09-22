@@ -52,10 +52,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const transactionIdInput = document.getElementById("transactionId");
     const transactionForm = document.getElementById("transactionForm");
 
-    // Pre-fill next estimated Transaction ID
-    if (transactionIdInput) {
-        transactionIdInput.value = "WB" + String(Math.floor(Math.random() * 900000) + 100000);
-    }
 
     // 1. Booth Selection -> Populate Location & Filter Services
     if (boothSelect) {
@@ -144,9 +140,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (locationInput) locationInput.value = "";
                     if (revenueInput) revenueInput.value = "";
                     if (taxAmountInput) taxAmountInput.value = "";
-                    if (transactionIdInput) {
-                        transactionIdInput.value = "WB" + String(Math.floor(Math.random() * 900000) + 100000);
-                    }
                 } else {
                     msgElement.className = "alert alert-danger";
                     msgElement.textContent = `Error: ${data.error || 'Failed to process transaction.'}`;
