@@ -36,6 +36,12 @@
         <section class="panel form-panel">
           <form id="transactionForm">
 
+            <!-- Transaction ID (Auto-generated) -->
+            <div class="form-group">
+              <label for="transactionId">Transaction ID</label>
+              <input type="text" id="transactionId" class="form-input" readonly placeholder="WB0000001">
+            </div>
+
             <!-- Mobile Booth Dropdown -->
             <div class="form-group">
               <label for="booth">Mobile Booth</label>
@@ -74,6 +80,12 @@
             <div class="form-group">
               <label for="amount">Transaction Amount (ZMW)</label>
               <input type="number" id="amount" class="form-input" min="1" step="any" placeholder="Enter amount" required>
+            </div>
+
+            <!-- Calculated Amount After Tax -->
+            <div class="form-group">
+              <label for="amountAfterTax">Amount After Tax (10% Tax Deduction)</label>
+              <input type="text" id="amountAfterTax" class="form-input" readonly placeholder="Calculated automatically">
             </div>
 
             <button type="submit" class="btn-primary">Submit Transaction</button>
