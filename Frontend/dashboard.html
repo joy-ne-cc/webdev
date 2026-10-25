@@ -1,119 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wina Bwangu — Dashboard</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101f2b"><meta name="description" content="Monitor Wina Bwangu booth and mobile money service performance.">
+  <title>Operations overview · Wina Bwangu</title>
+  <link rel="icon" type="image/svg+xml" href="assets/wina-bwangu-mark.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
   <div class="app-shell">
-
-    <!-- ============ NAVIGATION ============ -->
-    <nav class="sidenav" aria-label="Main navigation">
-      <div class="sidenav-brand">
-        <span class="sidenav-brand-mark">WB</span>
-        <span class="sidenav-brand-name">Wina Bwangu</span>
+    <aside class="sidebar"><a class="brand" href="dashboard.html" aria-label="Wina Bwangu dashboard"><img class="brand-logo" src="assets/wina-bwangu-logo.svg" alt="Wina Bwangu — Booth Operations"></a><div class="nav-label">WORKSPACE</div><nav class="nav-links" aria-label="Main navigation"><a class="nav-link active" href="dashboard.html" aria-current="page"><span class="nav-icon">▦</span><span>Dashboard</span><span class="nav-current"></span></a><a class="nav-link" href="index.html"><span class="nav-icon">＋</span><span>New transaction</span></a></nav><div class="sidebar-bottom"><div class="sidebar-status"><span class="status-dot"></span><span><strong>Operations workspace</strong><small>Mobile money services</small></span></div><p class="sidebar-foot">SIMPLE. CLEAR. ACCOUNTABLE.</p></div></aside>
+    <main class="main-area"><header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong>Dashboard</strong></div><div class="topbar-right"><span class="secure-label"><span class="secure-icon">✓</span> Performance monitoring</span><span class="avatar">WB</span></div></header>
+      <div class="page-content dashboard-content"><section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-line"></span> BUSINESS PERFORMANCE</div><h1>Operations overview<span>.</span></h1><p>A clear view of revenue, service limits, and activity across your booths.</p></div><a class="btn-primary compact-button" href="index.html"><span>＋ New transaction</span></a></section>
+        <div id="dashboardMessage" role="status" aria-live="polite"></div>
+        <section class="metric-grid" aria-label="Key performance indicators"><article class="metric-card metric-revenue"><div class="metric-head"><span>Total revenue</span><span class="metric-icon" aria-hidden="true">↗</span></div><div class="metric-value" id="total-revenue">—</div><div class="metric-foot">Calculated from recorded transactions</div></article><article class="metric-card"><div class="metric-head"><span>Total capital</span><span class="metric-icon" aria-hidden="true">◈</span></div><div class="metric-value" id="total-capital">—</div><div class="metric-foot">Combined monthly service limits</div></article><article class="metric-card"><div class="metric-head"><span>Transactions recorded</span><span class="metric-icon" aria-hidden="true">≡</span></div><div class="metric-value" id="total-transactions">—</div><div class="metric-foot">Across all available booths</div></article></section>
+        <section class="dashboard-grid">
+          <article class="surface panel-wide"><div class="section-heading"><div><div class="section-overline">MONTHLY ALLOWANCE</div><h2>Service limits</h2><p>Usage and remaining value against each service limit.</p></div><span class="section-count" id="service-count">Loading…</span></div><div class="table-scroll"><table class="data-table"><thead><tr><th scope="col">Service</th><th scope="col">Monthly limit</th><th scope="col">Used</th><th scope="col">Remaining</th><th scope="col">Utilization</th></tr></thead><tbody id="service-limits-body"><tr><td colspan="5" class="table-loading" role="status">Loading service data…</td></tr></tbody></table></div></article>
+          <article class="surface"><div class="section-heading"><div><div class="section-overline">LOCATION BREAKDOWN</div><h2>Booth performance</h2><p>Ranked by generated revenue.</p></div></div><div id="booth-performance" class="booth-performance"><p class="table-loading">Loading booth data…</p></div></article>
+          <article class="surface"><div class="section-heading"><div><div class="section-overline">CAPITAL POSITION</div><h2>Revenue vs capital</h2><p>Revenue compared with total service limits.</p></div></div><div class="capital-chart-wrap"><div id="summary-pie" class="pie-chart" role="img" aria-label="Revenue compared with total capital"></div><div class="pie-center"><span>Revenue</span><strong id="revenue-share">—</strong></div></div><div class="pie-legend" id="pie-legend"></div></article>
+          <article class="surface panel-wide recent-panel"><div class="section-heading"><div><div class="section-overline">RECENT ACTIVITY</div><h2>Latest transactions</h2><p>The most recently recorded entries, with their tax calculation.</p></div><a class="section-action" href="index.html">Record a transaction <span aria-hidden="true">→</span></a></div><div class="table-scroll"><table class="data-table recent-table"><thead><tr><th scope="col">Transaction ID</th><th scope="col">Booth</th><th scope="col">Service</th><th scope="col">Amount</th><th scope="col">Tax</th><th scope="col">After tax</th></tr></thead><tbody id="recent-transactions-body"><tr><td colspan="6" class="table-loading" role="status">Loading recent transactions…</td></tr></tbody></table></div></article>
+          <article class="surface panel-wide"><div class="section-heading"><div><div class="section-overline">SERVICE USE</div><h2>Transaction count by booth</h2><p>Number of recorded transactions for each service at each booth.</p></div></div><div class="table-scroll"><table class="data-table frequency-table" id="frequency-table"><tbody><tr><td class="table-loading" role="status">Loading activity…</td></tr></tbody></table></div></article>
+          <article class="surface panel-wide"><div class="section-heading"><div><div class="section-overline">TAX MONITORING</div><h2>Tax obligation overview</h2><p>Estimated tax associated with recorded transaction values, at the configured 10% rate.</p></div></div><div id="tax-obligations" class="tax-list"><p class="table-loading">Loading tax figures…</p></div><p class="data-note"><span>i</span> Tax values are estimates based on the project's current 10% assumption. Confirm the required rate before production use.</p></article>
+        </section>
+        <footer class="page-footer"><span>Wina Bwangu <span class="footer-dot">·</span> Booth operations</span><span>Figures depend on the available transaction data.</span></footer>
       </div>
-      <ul class="sidenav-links">
-        <li><a href="index.html" class="sidenav-link">New Transaction</a></li>
-        <li><a href="dashboard.html" class="sidenav-link sidenav-link--active" aria-current="page">Dashboard</a></li>
-      </ul>
-    </nav>
-
-    <!-- ============ MAIN CONTENT ============ -->
-    <div class="main-column">
-
-      <header class="page-header">
-        <h1>Operations Dashboard</h1>
-        <p class="page-subtitle">February 2021 — mobile booth performance</p>
-      </header>
-
-      <main class="dashboard-grid">
-
-        <!-- Item 9: summary cards -->
-        <section class="summary-cards" aria-label="Summary totals">
-          <div class="summary-card">
-            <span class="summary-card-label">Total Revenue</span>
-            <span class="summary-card-value" id="total-revenue">—</span>
-          </div>
-          <div class="summary-card">
-            <span class="summary-card-label">Total Capital</span>
-            <span class="summary-card-value" id="total-capital">—</span>
-          </div>
-        </section>
-
-        <!-- Item 6: service limits, cumulative totals, remaining credit -->
-        <section class="panel panel--wide" aria-labelledby="service-limits-heading">
-          <h2 id="service-limits-heading">Service Limits &amp; Remaining Credit</h2>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Service</th>
-                <th>Monthly Limit</th>
-                <th>Cumulative Total</th>
-                <th>Remaining</th>
-                <th>Limit Used</th>
-              </tr>
-            </thead>
-            <tbody id="service-limits-body">
-              <!-- populated by dashboard.js -->
-            </tbody>
-          </table>
-        </section>
-
-        <!-- Item 7: booth revenue -->
-        <section class="panel" aria-labelledby="booth-revenue-heading">
-          <h2 id="booth-revenue-heading">Revenue by Booth</h2>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Booth</th>
-                <th>Location</th>
-                <th>Cumulative Revenue</th>
-              </tr>
-            </thead>
-            <tbody id="booth-revenue-body">
-              <!-- populated by dashboard.js -->
-            </tbody>
-          </table>
-        </section>
-
-        <!-- Item 10: pie chart of summary totals -->
-        <section class="panel" aria-labelledby="summary-pie-heading">
-          <h2 id="summary-pie-heading">Revenue vs Capital</h2>
-          <div class="pie-wrap">
-            <div class="pie-chart" id="summary-pie" role="img" aria-label="Pie chart of total revenue versus total capital"></div>
-            <div class="pie-legend" id="pie-legend">
-              <!-- populated by dashboard.js -->
-            </div>
-          </div>
-        </section>
-
-        <!-- Item 8: service frequency per booth -->
-        <section class="panel panel--wide" aria-labelledby="frequency-heading">
-          <h2 id="frequency-heading">Service Frequency by Booth</h2>
-          <div class="table-scroll">
-            <table class="data-table frequency-table" id="frequency-table">
-              <!-- head + body populated by dashboard.js -->
-            </table>
-          </div>
-        </section>
-
-        <!-- Tax obligation performance -->
-        <section class="panel panel--wide" aria-labelledby="tax-heading">
-          <h2 id="tax-heading">Tax Obligation Performance</h2>
-          <div class="tax-list" id="tax-obligations">
-            <!-- populated by dashboard.js -->
-          </div>
-        </section>
-
-      </main>
-    </div>
+    </main>
   </div>
-
-  <script src="mock-data.js"></script>
-  <script src="dashboard.js"></script>
+  <script src="mock-data.js"></script><script src="dashboard.js"></script>
 </body>
 </html>

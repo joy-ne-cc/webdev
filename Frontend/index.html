@@ -1,100 +1,54 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wina Bwangu — New Transaction</title>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101f2b">
+  <meta name="description" content="Record and review Wina Bwangu mobile money booth transactions.">
+  <title>New transaction · Wina Bwangu</title>
+  <link rel="icon" type="image/svg+xml" href="assets/wina-bwangu-mark.svg">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
   <div class="app-shell">
-
-    <!-- Sidebar Navigation -->
-    <nav class="sidenav" aria-label="Main navigation">
-      <div class="sidenav-brand">
-        <span class="sidenav-brand-mark">WB</span>
-        <span class="sidenav-brand-name">Wina Bwangu</span>
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html" aria-label="Wina Bwangu dashboard"><img class="brand-logo" src="assets/wina-bwangu-logo.svg" alt="Wina Bwangu — Booth Operations"></a>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a class="nav-link" href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+        <a class="nav-link active" href="index.html" aria-current="page"><span class="nav-icon">＋</span><span>New transaction</span><span class="nav-current"></span></a>
+      </nav>
+      <div class="sidebar-bottom"><div class="sidebar-status"><span class="status-dot"></span><span><strong>Operations workspace</strong><small>Mobile money services</small></span></div><p class="sidebar-foot">SIMPLE. CLEAR. ACCOUNTABLE.</p></div>
+    </aside>
+    <main class="main-area">
+      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong>New transaction</strong></div><div class="topbar-right"><span class="secure-label"><span class="secure-icon">✓</span> Transaction entry</span><span class="avatar">WB</span></div></header>
+      <div class="page-content">
+        <section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-line"></span> TRANSACTION MANAGEMENT</div><h1>Record a transaction<span>.</span></h1><p>Capture booth activity accurately, with the key figures calculated for you.</p></div><a class="text-link" href="dashboard.html">View performance <span aria-hidden="true">↗</span></a></section>
+        <div id="formMessage" role="status" aria-live="polite"></div>
+        <div class="transaction-layout">
+          <section class="surface transaction-card" aria-labelledby="details-heading">
+            <div class="surface-heading"><div class="step-badge">01</div><div><h2 id="details-heading">Transaction details</h2><p>Choose the booth and service used.</p></div><span class="required-note">* Required fields</span></div>
+            <form id="transactionForm" novalidate>
+              <div class="form-grid">
+                <div class="form-group full-width"><label for="transactionId">Transaction ID</label><div class="input-wrap"><span class="input-prefix">ID</span><input type="text" id="transactionId" class="form-input" readonly placeholder="Generated after submission"><span class="field-tag">AUTO</span></div><small class="field-help">A unique ID appears here after a successful save.</small></div>
+                <div class="form-group"><label for="booth">Mobile booth <span class="required">*</span></label><select id="booth" class="form-input" required><option value="">Choose a booth</option></select><small class="field-help">Select the location handling this transaction.</small></div>
+                <div class="form-group"><label for="location">Booth location</label><input type="text" id="location" class="form-input readonly-field" readonly placeholder="Set automatically"><small class="field-help">Filled in from the selected booth.</small></div>
+                <div class="form-group"><label for="service">Service provider <span class="required">*</span></label><select id="service" class="form-input" required disabled><option value="">Choose a booth first</option></select></div>
+                <div class="form-group"><label for="revenue">Revenue rate</label><div class="input-wrap"><input type="text" id="revenue" class="form-input readonly-field has-suffix" readonly placeholder="—"><span class="input-suffix">per K1</span></div><small class="field-help">The configured rate for the selected service.</small></div>
+                <div class="form-group full-width"><label for="amount">Transaction amount <span class="required">*</span></label><div class="input-wrap amount-wrap"><span class="input-prefix currency-prefix">K</span><input type="number" id="amount" class="form-input amount-input" min="0.01" step="0.01" inputmode="decimal" placeholder="0.00" required><span class="input-suffix">ZMW</span></div><small class="field-help">Enter the transaction value in Zambian kwacha.</small></div>
+              </div>
+              <div class="calculation-box"><div class="calc-top"><div><span class="calc-kicker">ESTIMATED PAYOUT</span><h3>After tax deduction</h3><p>Based on the current 10% placeholder tax rate.</p></div><div class="tax-pill">10% tax</div></div><div class="calc-bottom"><div><span class="calc-label">Transaction amount</span><strong id="calcGross">K0.00</strong></div><span class="calc-minus">−</span><div><span class="calc-label">Tax deduction</span><strong id="calcTax">K0.00</strong></div><span class="calc-equals">=</span><div class="calc-net"><span class="calc-label">Amount after tax</span><strong id="amountAfterTax">K0.00</strong></div></div></div>
+              <div class="form-actions"><p><span class="lock-mark">✓</span> Check your details before saving.</p><button type="submit" class="btn-primary"><span class="button-label">Record transaction</span><span class="button-arrow" aria-hidden="true">→</span></button></div>
+            </form>
+          </section>
+          <aside class="side-column">
+            <section class="guidance-card"><div class="guidance-icon">↗</div><div class="eyebrow light-eyebrow">QUICK GUIDE</div><h2>Make every entry count.</h2><p>A few checks now help keep booth records consistent and reliable.</p><ol class="guide-list"><li><span>1</span><div><strong>Confirm the booth</strong><small>Use the location where the transaction took place.</small></div></li><li><span>2</span><div><strong>Match the service</strong><small>Only services available at that booth can be selected.</small></div></li><li><span>3</span><div><strong>Review the amount</strong><small>Check the total and estimated tax before saving.</small></div></li></ol><div class="guidance-foot"><span class="status-dot"></span> Amounts are shown in ZMW</div></section>
+            <section class="help-card"><div class="help-symbol">i</div><div><strong>Need the bigger picture?</strong><p>Review service limits and compare performance across all six booths.</p><a href="dashboard.html">Open overview <span>→</span></a></div></section>
+          </aside>
+        </div>
+        <footer class="page-footer"><span>Wina Bwangu <span class="footer-dot">·</span> Booth operations</span><span>Clear records. Better decisions.</span></footer>
       </div>
-      <ul class="sidenav-links">
-        <li><a href="index.html" class="sidenav-link sidenav-link--active" aria-current="page">New Transaction</a></li>
-        <li><a href="dashboard.html" class="sidenav-link">Dashboard</a></li>
-      </ul>
-    </nav>
-
-    <!-- Main Content Area -->
-    <div class="main-column">
-
-      <header class="page-header">
-        <h1>Record New Transaction</h1>
-        <p class="page-subtitle">Select mobile booth and service to process transaction</p>
-      </header>
-
-      <main>
-        <div id="formMessage"></div>
-
-        <section class="panel form-panel">
-          <form id="transactionForm">
-
-            <!-- Transaction ID (Auto-generated) -->
-            <div class="form-group">
-              <label for="transactionId">Transaction ID</label>
-              <input type="text" id="transactionId" class="form-input" readonly placeholder="Assigned when you submit">
-            </div>
-
-            <!-- Mobile Booth Dropdown -->
-            <div class="form-group">
-              <label for="booth">Mobile Booth</label>
-              <select id="booth" class="form-input" required>
-                <option value="">-- Select Mobile Booth --</option>
-                <option value="Wina1">Wina1 (Lusaka CPD)</option>
-                <option value="Wina2">Wina2 (Libala)</option>
-                <option value="Wina3">Wina3 (Kabwata)</option>
-                <option value="Wina4">Wina4 (Mandevu)</option>
-                <option value="Wina5">Wina5 (Woodlands)</option>
-                <option value="Wina6">Wina6 (Matero East)</option>
-              </select>
-            </div>
-
-            <!-- Location (Auto-populated) -->
-            <div class="form-group">
-              <label for="location">Location</label>
-              <input type="text" id="location" class="form-input" readonly placeholder="Auto-populated on selection">
-            </div>
-
-            <!-- Cascading Service Dropdown -->
-            <div class="form-group">
-              <label for="service">Service Offered</label>
-              <select id="service" class="form-input" required>
-                <option value="">-- Select Booth First --</option>
-              </select>
-            </div>
-
-            <!-- Revenue Rate (Auto-populated) -->
-            <div class="form-group">
-              <label for="revenue">Revenue Per Kwacha</label>
-              <input type="text" id="revenue" class="form-input" readonly placeholder="0.00">
-            </div>
-
-            <!-- Transaction Amount -->
-            <div class="form-group">
-              <label for="amount">Transaction Amount (ZMW)</label>
-              <input type="number" id="amount" class="form-input" min="1" step="any" placeholder="Enter amount" required>
-            </div>
-
-            <!-- Calculated Amount After Tax -->
-            <div class="form-group">
-              <label for="amountAfterTax">Amount After Tax (10% Tax Deduction)</label>
-              <input type="text" id="amountAfterTax" class="form-input" readonly placeholder="Calculated automatically">
-            </div>
-
-            <button type="submit" class="btn-primary">Submit Transaction</button>
-          </form>
-        </section>
-      </main>
-    </div>
+    </main>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>

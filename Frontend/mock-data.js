@@ -33,7 +33,7 @@ window.dashboardData = {
 
   // Item 7: cumulative revenue per mobile booth
   booths: [
-    { code: "Wina1", location: "Lusaka CPD",  cumulativeRevenue: 132400 },
+    { code: "Wina1", location: "Lusaka CBD",  cumulativeRevenue: 132400 },
     { code: "Wina2", location: "Libala",      cumulativeRevenue: 118900 },
     { code: "Wina3", location: "Kabwata",     cumulativeRevenue: 246700 },
     { code: "Wina4", location: "Mandevu",     cumulativeRevenue: 154200 },
