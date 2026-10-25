@@ -1,13 +1,13 @@
 TransactionID,BoothID,BoothName,Location,ServiceID,ServiceName,RevenuePerKwacha,TransactionAmount
-WB0000001,1,Wina1,Lusaka CPD,1,Airtel Money,0.05,964
-WB0000002,1,Wina1,Lusaka CPD,2,MTN Money,0.06,220
+WB0000001,1,Wina1,Lusaka CBD,1,Airtel Money,0.05,964
+WB0000002,1,Wina1,Lusaka CBD,2,MTN Money,0.06,220
 WB0000003,2,Wina2,Libala,2,MTN Money,0.06,582
 WB0000004,3,Wina3,Kabwata,3,Zamtel Money,0.045,349
 WB0000005,4,Wina4,Mandevu,1,Airtel Money,0.05,328
 WB0000006,3,Wina3,Kabwata,2,MTN Money,0.06,192
 WB0000007,3,Wina3,Kabwata,4,Zanaco,0.035,1519
 WB0000008,4,Wina4,Mandevu,3,Zamtel Money,0.045,1113
-WB0000009,1,Wina1,Lusaka CPD,5,FNB,0.04,1999
+WB0000009,1,Wina1,Lusaka CBD,5,FNB,0.04,1999
 WB0000010,3,Wina3,Kabwata,1,Airtel Money,0.05,3810
 WB0000011,6,Wina6,Matero East,3,Zamtel Money,0.045,3270
 WB0000012,3,Wina3,Kabwata,4,Zanaco,0.035,1092
@@ -28,15 +28,15 @@ WB0000026,4,Wina4,Mandevu,1,Airtel Money,0.05,90
 WB0000027,5,Wina5,Woodlands,5,FNB,0.04,2556
 WB0000028,3,Wina3,Kabwata,4,Zanaco,0.035,673
 WB0000029,4,Wina4,Mandevu,2,MTN Money,0.06,4185
-WB0000030,1,Wina1,Lusaka CPD,4,Zanaco,0.035,412
-WB0000031,1,Wina1,Lusaka CPD,2,MTN Money,0.06,310
+WB0000030,1,Wina1,Lusaka CBD,4,Zanaco,0.035,412
+WB0000031,1,Wina1,Lusaka CBD,2,MTN Money,0.06,310
 WB0000032,2,Wina2,Libala,2,MTN Money,0.06,4248
 WB0000033,3,Wina3,Kabwata,1,Airtel Money,0.05,4105
 WB0000034,4,Wina4,Mandevu,1,Airtel Money,0.05,1147
 WB0000035,3,Wina3,Kabwata,3,Zamtel Money,0.045,1815
 WB0000036,3,Wina3,Kabwata,4,Zanaco,0.035,1653
 WB0000037,4,Wina4,Mandevu,1,Airtel Money,0.05,1045
-WB0000038,1,Wina1,Lusaka CPD,5,FNB,0.04,4364
+WB0000038,1,Wina1,Lusaka CBD,5,FNB,0.04,4364
 WB0000039,3,Wina3,Kabwata,2,MTN Money,0.06,2822
 WB0000040,6,Wina6,Matero East,1,Airtel Money,0.05,2046
 WB0000041,3,Wina3,Kabwata,3,Zamtel Money,0.045,1985
@@ -57,15 +57,15 @@ WB0000055,4,Wina4,Mandevu,1,Airtel Money,0.05,1011
 WB0000056,5,Wina5,Woodlands,5,FNB,0.04,2950
 WB0000057,3,Wina3,Kabwata,4,Zanaco,0.035,57
 WB0000058,4,Wina4,Mandevu,1,Airtel Money,0.05,2382
-WB0000059,1,Wina1,Lusaka CPD,2,MTN Money,0.06,349
-WB0000060,1,Wina1,Lusaka CPD,1,Airtel Money,0.05,2479
+WB0000059,1,Wina1,Lusaka CBD,2,MTN Money,0.06,349
+WB0000060,1,Wina1,Lusaka CBD,1,Airtel Money,0.05,2479
 WB0000061,2,Wina2,Libala,1,Airtel Money,0.05,1537
 WB0000062,3,Wina3,Kabwata,3,Zamtel Money,0.045,2802
 WB0000063,4,Wina4,Mandevu,1,Airtel Money,0.05,1290
 WB0000064,3,Wina3,Kabwata,2,MTN Money,0.06,4331
 WB0000065,3,Wina3,Kabwata,4,Zanaco,0.035,1338
 WB0000066,4,Wina4,Mandevu,1,Airtel Money,0.05,1477
-WB0000067,1,Wina1,Lusaka CPD,1,Airtel Money,0.05,3430
+WB0000067,1,Wina1,Lusaka CBD,1,Airtel Money,0.05,3430
 WB0000068,3,Wina3,Kabwata,2,MTN Money,0.06,451
 WB0000069,6,Wina6,Matero East,1,Airtel Money,0.05,80
 WB0000070,3,Wina3,Kabwata,4,Zanaco,0.035,2002
@@ -112,7 +112,7 @@ WB0000110,4,Wina4,Mandevu,1,Airtel Money,0.05,1623
 WB0000111,3,Wina3,Kabwata,1,Airtel Money,0.05,2679
 WB0000112,3,Wina3,Kabwata,4,Zanaco,0.035,1976
 WB0000113,4,Wina4,Mandevu,1,Airtel Money,0.05,974
-WB0000114,1,Wina1,Lusaka CPD,1,Airtel Money,0.05,2911
+WB0000114,1,Wina1,Lusaka CBD,1,Airtel Money,0.05,2911
 WB0000115,3,Wina3,Kabwata,4,Zanaco,0.035,279
 WB0000116,6,Wina6,Matero East,1,Airtel Money,0.05,3646
 WB0000117,3,Wina3,Kabwata,2,MTN Money,0.06,855
@@ -123,7 +123,7 @@ WB0000121,2,Wina2,Libala,1,Airtel Money,0.05,1219
 WB0000122,5,Wina5,Woodlands,5,FNB,0.04,3582
 WB0000123,3,Wina3,Kabwata,1,Airtel Money,0.05,760
 WB0000124,4,Wina4,Mandevu,2,MTN Money,0.06,2308
-WB0000125,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,1941
+WB0000125,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,1941
 WB0000126,3,Wina3,Kabwata,1,Airtel Money,0.05,2068
 WB0000127,6,Wina6,Matero East,2,MTN Money,0.06,4242
 WB0000128,3,Wina3,Kabwata,1,Airtel Money,0.05,2587
@@ -144,10 +144,10 @@ WB0000142,4,Wina4,Mandevu,1,Airtel Money,0.05,1039
 WB0000143,5,Wina5,Woodlands,5,FNB,0.04,254
 WB0000144,3,Wina3,Kabwata,2,MTN Money,0.06,870
 WB0000145,4,Wina4,Mandevu,2,MTN Money,0.06,772
-WB0000146,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,1791
+WB0000146,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,1791
 WB0000147,3,Wina3,Kabwata,1,Airtel Money,0.05,3320
 WB0000148,4,Wina4,Mandevu,1,Airtel Money,0.05,4185
-WB0000149,1,Wina1,Lusaka CPD,2,MTN Money,0.06,100
+WB0000149,1,Wina1,Lusaka CBD,2,MTN Money,0.06,100
 WB0000150,3,Wina3,Kabwata,2,MTN Money,0.06,3794
 WB0000151,6,Wina6,Matero East,1,Airtel Money,0.05,498
 WB0000152,3,Wina3,Kabwata,1,Airtel Money,0.05,2566
@@ -168,8 +168,8 @@ WB0000166,4,Wina4,Mandevu,3,Zamtel Money,0.045,3284
 WB0000167,5,Wina5,Woodlands,1,Airtel Money,0.05,425
 WB0000168,3,Wina3,Kabwata,4,Zanaco,0.035,1856
 WB0000169,4,Wina4,Mandevu,1,Airtel Money,0.05,405
-WB0000170,1,Wina1,Lusaka CPD,5,FNB,0.04,608
-WB0000171,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,4143
+WB0000170,1,Wina1,Lusaka CBD,5,FNB,0.04,608
+WB0000171,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,4143
 WB0000172,3,Wina3,Kabwata,1,Airtel Money,0.05,681
 WB0000173,6,Wina6,Matero East,2,MTN Money,0.06,4405
 WB0000174,3,Wina3,Kabwata,1,Airtel Money,0.05,3980
@@ -190,10 +190,10 @@ WB0000188,4,Wina4,Mandevu,1,Airtel Money,0.05,2713
 WB0000189,5,Wina5,Woodlands,5,FNB,0.04,1727
 WB0000190,3,Wina3,Kabwata,2,MTN Money,0.06,2060
 WB0000191,4,Wina4,Mandevu,2,MTN Money,0.06,268
-WB0000192,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,2327
+WB0000192,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,2327
 WB0000193,3,Wina3,Kabwata,1,Airtel Money,0.05,3027
 WB0000194,4,Wina4,Mandevu,1,Airtel Money,0.05,897
-WB0000195,1,Wina1,Lusaka CPD,2,MTN Money,0.06,2275
+WB0000195,1,Wina1,Lusaka CBD,2,MTN Money,0.06,2275
 WB0000196,3,Wina3,Kabwata,2,MTN Money,0.06,1246
 WB0000197,6,Wina6,Matero East,1,Airtel Money,0.05,2768
 WB0000198,3,Wina3,Kabwata,1,Airtel Money,0.05,3082
@@ -214,8 +214,8 @@ WB0000212,4,Wina4,Mandevu,3,Zamtel Money,0.045,394
 WB0000213,5,Wina5,Woodlands,1,Airtel Money,0.05,4272
 WB0000214,3,Wina3,Kabwata,4,Zanaco,0.035,4187
 WB0000215,4,Wina4,Mandevu,1,Airtel Money,0.05,913
-WB0000216,1,Wina1,Lusaka CPD,5,FNB,0.04,3651
-WB0000217,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,1000
+WB0000216,1,Wina1,Lusaka CBD,5,FNB,0.04,3651
+WB0000217,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,1000
 WB0000218,3,Wina3,Kabwata,1,Airtel Money,0.05,839
 WB0000219,6,Wina6,Matero East,2,MTN Money,0.06,1851
 WB0000220,3,Wina3,Kabwata,1,Airtel Money,0.05,1341
@@ -236,10 +236,10 @@ WB0000234,4,Wina4,Mandevu,1,Airtel Money,0.05,1280
 WB0000235,5,Wina5,Woodlands,5,FNB,0.04,335
 WB0000236,3,Wina3,Kabwata,2,MTN Money,0.06,2268
 WB0000237,4,Wina4,Mandevu,2,MTN Money,0.06,2815
-WB0000238,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,4414
+WB0000238,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,4414
 WB0000239,3,Wina3,Kabwata,1,Airtel Money,0.05,654
 WB0000240,4,Wina4,Mandevu,1,Airtel Money,0.05,2180
-WB0000241,1,Wina1,Lusaka CPD,2,MTN Money,0.06,2869
+WB0000241,1,Wina1,Lusaka CBD,2,MTN Money,0.06,2869
 WB0000242,3,Wina3,Kabwata,2,MTN Money,0.06,3757
 WB0000243,6,Wina6,Matero East,1,Airtel Money,0.05,2038
 WB0000244,3,Wina3,Kabwata,1,Airtel Money,0.05,1344
@@ -260,8 +260,8 @@ WB0000258,4,Wina4,Mandevu,3,Zamtel Money,0.045,4421
 WB0000259,5,Wina5,Woodlands,1,Airtel Money,0.05,1863
 WB0000260,3,Wina3,Kabwata,4,Zanaco,0.035,2465
 WB0000261,4,Wina4,Mandevu,1,Airtel Money,0.05,3775
-WB0000262,1,Wina1,Lusaka CPD,5,FNB,0.04,2897
-WB0000263,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,3994
+WB0000262,1,Wina1,Lusaka CBD,5,FNB,0.04,2897
+WB0000263,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,3994
 WB0000264,3,Wina3,Kabwata,1,Airtel Money,0.05,586
 WB0000265,6,Wina6,Matero East,2,MTN Money,0.06,2562
 WB0000266,3,Wina3,Kabwata,1,Airtel Money,0.05,3867
@@ -282,10 +282,10 @@ WB0000280,4,Wina4,Mandevu,1,Airtel Money,0.05,2475
 WB0000281,5,Wina5,Woodlands,5,FNB,0.04,3597
 WB0000282,3,Wina3,Kabwata,2,MTN Money,0.06,1659
 WB0000283,4,Wina4,Mandevu,2,MTN Money,0.06,4163
-WB0000284,1,Wina1,Lusaka CPD,3,Zamtel Money,0.045,487
+WB0000284,1,Wina1,Lusaka CBD,3,Zamtel Money,0.045,487
 WB0000285,3,Wina3,Kabwata,1,Airtel Money,0.05,3790
 WB0000286,4,Wina4,Mandevu,1,Airtel Money,0.05,2186
-WB0000287,1,Wina1,Lusaka CPD,2,MTN Money,0.06,1894
+WB0000287,1,Wina1,Lusaka CBD,2,MTN Money,0.06,1894
 WB0000288,3,Wina3,Kabwata,2,MTN Money,0.06,1458
 WB0000289,6,Wina6,Matero East,1,Airtel Money,0.05,875
 WB0000290,3,Wina3,Kabwata,1,Airtel Money,0.05,189
@@ -306,4 +306,4 @@ WB0000304,4,Wina4,Mandevu,3,Zamtel Money,0.045,301
 WB0000305,5,Wina5,Woodlands,1,Airtel Money,0.05,3672
 WB0000306,3,Wina3,Kabwata,4,Zanaco,0.035,1542
 WB0000307,4,Wina4,Mandevu,1,Airtel Money,0.05,2001
-WB0000308,1,Wina1,Lusaka CPD,5,FNB,0.04,3166
+WB0000308,1,Wina1,Lusaka CBD,5,FNB,0.04,3166
