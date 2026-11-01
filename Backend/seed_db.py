@@ -62,7 +62,7 @@ def seed():
                 location_id=location_cache[row["Location"]].id,
             )
             db.session.add(booth)
-            booth_cache[row["BoothName"]] = booth
+            booth_cache[booth.id] = booth
         db.session.flush()
 
         # Services
@@ -75,7 +75,7 @@ def seed():
                 revenue_per_kwacha=row["RevenuePerKwacha"],
             )
             db.session.add(svc)
-            service_cache[row["ServiceName"]] = svc
+            service_cache[svc.id] = svc
         db.session.flush()
 
         # Booth <-> service offerings
