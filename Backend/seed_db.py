@@ -8,6 +8,7 @@ import csv
 import sys
 from pathlib import Path
 
+from flask import current_app
 from app import create_app
 from app.extensions import db
 from app.models import Location, MobileBooth, Service, BoothService, Transaction
@@ -21,101 +22,112 @@ def load_csv(name):
         return list(csv.DictReader(f))
 
 
-def seed():
-    app = create_app()
+def seed_database(reset=False):
+    if reset:
+        db.drop_all()
+    db.create_all()
+
+    seeded_tables = [
+        Location.query.first(),
+        MobileBooth.query.first(),
+        Service.query.first(),
+        BoothService.query.first(),
+        Transaction.query.first(),
+    ]
+    if all(seeded_tables):
+        print("Database already has data — skipping seed. Use --reset to reload.")
+        return
+    if any(seeded_tables):
+        raise RuntimeError(
+            "Database contains a partial seed. Use --reset to rebuild it from the CSV files."
+        )
+
+    # Locations + booths
+    booth_rows = load_csv("booths.csv")
+    location_cache = {}
+    for row in booth_rows:
+        loc_name = row["Location"]
+        if loc_name not in location_cache:
+            loc = Location(name=loc_name)
+            db.session.add(loc)
+            location_cache[loc_name] = loc
+    db.session.flush()
+
+    booth_cache = {}
+    for row in booth_rows:
+        booth = MobileBooth(
+            id=int(row["BoothID"]),
+            name=row["BoothName"],
+            location_id=location_cache[row["Location"]].id,
+        )
+        db.session.add(booth)
+        booth_cache[booth.id] = booth
+    db.session.flush()
+
+    # Services
+    service_cache = {}
+    for row in load_csv("services.csv"):
+        svc = Service(
+            id=int(row["ServiceID"]),
+            name=row["ServiceName"],
+            monthly_limit=row["MonthlyLimit"],
+            revenue_per_kwacha=row["RevenuePerKwacha"],
+        )
+        db.session.add(svc)
+        service_cache[svc.id] = svc
+    db.session.flush()
+
+    # Booth <-> service offerings
+    for row in load_csv("booth_services.csv"):
+        booth_id, service_id = int(row["BoothID"]), int(row["ServiceID"])
+        if booth_id not in booth_cache or service_id not in service_cache:
+            raise ValueError(f"Unknown booth or service in booth_services.csv: {row}")
+        db.session.add(BoothService(
+            booth_id=booth_id,
+            service_id=service_id,
+        ))
+    db.session.flush()
+
+    # Transactions
+    tax_rate = current_app.config["TAX_RATE"]
+    count = 0
+    for row in load_csv("transactions.csv"):
+        booth_id, service_id = int(row["BoothID"]), int(row["ServiceID"])
+        if booth_id not in booth_cache or service_id not in service_cache:
+            raise ValueError(f"Unknown booth or service in transactions.csv: {row}")
+        amount = parse_transaction_amount(row["TransactionAmount"])
+        tax_amount, amount_after_tax = apply_tax(amount, tax_rate)
+        db.session.add(Transaction(
+            id=row["TransactionID"],
+            booth_id=booth_id,
+            service_id=service_id,
+            amount=amount,
+            tax_amount=tax_amount,
+            amount_after_tax=amount_after_tax,
+        ))
+        count += 1
+
+    try:
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+    result = {
+        "locations": len(location_cache),
+        "booths": len(booth_cache),
+        "services": len(service_cache),
+        "transactions": count,
+    }
+    print(f"Seeded {result['locations']} locations, {result['booths']} booths, "
+          f"{result['services']} services, {result['transactions']} transactions.")
+    return result
+
+
+def seed(reset=False, app=None):
+    app = app or create_app()
     with app.app_context():
-        if "--reset" in sys.argv:
-            db.drop_all()
-        db.create_all()
-
-        seeded_tables = [
-            Location.query.first(),
-            MobileBooth.query.first(),
-            Service.query.first(),
-            BoothService.query.first(),
-            Transaction.query.first(),
-        ]
-        if all(seeded_tables):
-            print("Database already has data — skipping seed. Use --reset to reload.")
-            return
-        if any(seeded_tables):
-            raise RuntimeError(
-                "Database contains a partial seed. Use --reset to rebuild it from the CSV files."
-            )
-
-        # Locations + booths
-        booth_rows = load_csv("booths.csv")
-        location_cache = {}
-        for row in booth_rows:
-            loc_name = row["Location"]
-            if loc_name not in location_cache:
-                loc = Location(name=loc_name)
-                db.session.add(loc)
-                location_cache[loc_name] = loc
-        db.session.flush()
-
-        booth_cache = {}
-        for row in booth_rows:
-            booth = MobileBooth(
-                id=int(row["BoothID"]),
-                name=row["BoothName"],
-                location_id=location_cache[row["Location"]].id,
-            )
-            db.session.add(booth)
-            booth_cache[booth.id] = booth
-        db.session.flush()
-
-        # Services
-        service_cache = {}
-        for row in load_csv("services.csv"):
-            svc = Service(
-                id=int(row["ServiceID"]),
-                name=row["ServiceName"],
-                monthly_limit=row["MonthlyLimit"],
-                revenue_per_kwacha=row["RevenuePerKwacha"],
-            )
-            db.session.add(svc)
-            service_cache[svc.id] = svc
-        db.session.flush()
-
-        # Booth <-> service offerings
-        for row in load_csv("booth_services.csv"):
-            booth_id, service_id = int(row["BoothID"]), int(row["ServiceID"])
-            if booth_id not in booth_cache or service_id not in service_cache:
-                raise ValueError(f"Unknown booth or service in booth_services.csv: {row}")
-            db.session.add(BoothService(
-                booth_id=booth_id,
-                service_id=service_id,
-            ))
-        db.session.flush()
-
-        # Transactions
-        tax_rate = app.config["TAX_RATE"]
-        count = 0
-        for row in load_csv("transactions.csv"):
-            booth_id, service_id = int(row["BoothID"]), int(row["ServiceID"])
-            if booth_id not in booth_cache or service_id not in service_cache:
-                raise ValueError(f"Unknown booth or service in transactions.csv: {row}")
-            amount = parse_transaction_amount(row["TransactionAmount"])
-            tax_amount, amount_after_tax = apply_tax(amount, tax_rate)
-            db.session.add(Transaction(
-                id=row["TransactionID"],
-                booth_id=booth_id,
-                service_id=service_id,
-                amount=amount,
-                tax_amount=tax_amount,
-                amount_after_tax=amount_after_tax,
-            ))
-            count += 1
-
-        try:
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-        print(f"Seeded {len(location_cache)} locations, {len(booth_cache)} booths, "
-              f"{len(service_cache)} services, {count} transactions.")
+        return seed_database(reset=reset or "--reset" in sys.argv)
 
 
 if __name__ == "__main__":
-    seed()
+    seed(reset="--reset" in sys.argv)

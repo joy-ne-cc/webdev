@@ -26,6 +26,9 @@ class Config:
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", DEFAULT_DATABASE)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TAX_RATE = _tax_rate_from_env()
+    DEMO_MODE = os.environ.get("DEMO_MODE", "1").strip().lower() in {"1", "true", "yes"}
+    DEMO_ADMIN_EMAIL = os.environ.get("DEMO_ADMIN_EMAIL", "admin@winabwangu.com").strip().lower()
+    DEMO_ADMIN_PASSWORD = os.environ.get("DEMO_ADMIN_PASSWORD", "password")
     CORS_ORIGINS = [
         origin.strip()
         for origin in os.environ.get("CORS_ORIGINS", DEFAULT_CORS_ORIGINS).split(",")

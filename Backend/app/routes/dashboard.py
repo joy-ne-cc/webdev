@@ -1,25 +1,29 @@
 from flask import Blueprint, jsonify
-from sqlalchemy import func
+from sqlalchemy import and_, func
 from app.extensions import db
 from app.models import Transaction, MobileBooth, Service
+from app.utils import current_month_window
 
 bp = Blueprint("dashboard", __name__, url_prefix="/api/dashboard")
 
-# NOTE: the case study's Appendix 1 data has no per-transaction date field —
-# it's described as "the month of February 2021" as a single batch. So
-# "cumulative" here means "across all seeded transactions", i.e. one month's
-# worth. If your seed data later spans multiple months, filter by month here.
+# Seed rows have no event date, so their database entry time is used for the
+# monthly allowance. Date filters elsewhere also reflect database entry time.
 
 
 @bp.get("/service-summary")
 def service_summary():
-    """Req f: cumulative total and amount remaining vs monthly limit, per service."""
+    """Req f: current-month usage and remaining monthly limit per service."""
+    month_start, month_end = current_month_window()
     rows = (
         db.session.query(
             Service.id, Service.name, Service.monthly_limit,
             func.coalesce(func.sum(Transaction.amount), 0).label("cumulative_total"),
         )
-        .outerjoin(Transaction, Transaction.service_id == Service.id)
+        .outerjoin(Transaction, and_(
+            Transaction.service_id == Service.id,
+            Transaction.created_at >= month_start,
+            Transaction.created_at < month_end,
+        ))
         .group_by(Service.id)
         .order_by(Service.id)
         .all()

@@ -20,6 +20,7 @@
     const submit = form.querySelector('button[type="submit"]');
     let boothRecords = [];
     let serviceRecords = [];
+    let currentServiceBalance = null;
 
     function showMessage(kind, text) {
       message.className = `alert alert-${kind}`;
@@ -39,11 +40,43 @@
       $('calcGross').textContent = money(grossCents / 100);
       $('calcTax').textContent = money(taxCents / 100);
       $('amountAfterTax').textContent = money((grossCents - taxCents) / 100);
+      updateServiceCredit();
+    }
+    function updateServiceCredit() {
+      const note = $('serviceCreditNote');
+      note.className = 'field-help limit-warning';
+      if (!service.value) { note.textContent = 'Remaining service credit will appear after selection.'; return; }
+      if (!currentServiceBalance) { note.textContent = 'Checking remaining service credit…'; return; }
+      const entered = Number(amount.value);
+      if (Number.isFinite(entered) && entered > currentServiceBalance.remaining) {
+        note.classList.add('service-credit-danger');
+        note.textContent = `This exceeds the remaining ${currentServiceBalance.name} limit of ${money(currentServiceBalance.remaining)}.`;
+      } else if (currentServiceBalance.remaining <= currentServiceBalance.limit * 0.15) {
+        note.classList.add('service-credit-warning');
+        note.textContent = `Near the service limit: ${money(currentServiceBalance.remaining)} remains.`;
+      } else {
+        note.textContent = `${money(currentServiceBalance.remaining)} remains for ${currentServiceBalance.name} this month.`;
+      }
+    }
+    function showReceipt(transaction, selectedBooth, selectedService) {
+      const receipt = $('receiptPanel');
+      $('receiptId').textContent = transaction.id || transaction.transaction_id || '—';
+      $('receiptDate').textContent = transaction.created_at ? new Date(transaction.created_at).toLocaleString() : new Date().toLocaleString();
+      $('receiptBooth').textContent = `${selectedBooth?.name || '—'}${selectedBooth?.location ? ` · ${selectedBooth.location}` : ''}`;
+      $('receiptService').textContent = selectedService?.name || '—';
+      $('receiptRate').textContent = selectedService ? `${(Number(selectedService.revenue_per_kwacha) * 100).toFixed(2)}%` : '—';
+      $('receiptAmount').textContent = money(transaction.amount);
+      $('receiptTax').textContent = money(transaction.tax_amount);
+      $('receiptNet').textContent = money(transaction.amount_after_tax);
+      receipt.hidden = false;
+      receipt.scrollIntoView({behavior:'smooth', block:'nearest'});
     }
     function resetService() {
       service.replaceChildren(new Option(booth.value ? 'Loading services…' : 'Choose a booth first', ''));
       service.disabled = true;
       rate.value = '';
+      currentServiceBalance = null;
+      updateServiceCredit();
     }
 
     async function loadBooths() {
@@ -66,6 +99,7 @@
 
     booth.addEventListener('change', async () => {
       clearMessage();
+      $('receiptPanel').hidden = true;
       const selected = boothRecords.find(item => String(item.id) === booth.value);
       locationInput.value = selected?.location || '';
       resetService();
@@ -95,9 +129,27 @@
     service.addEventListener('change', () => {
       const selected = serviceRecords.find(item => String(item.id) === service.value);
       rate.value = selected && Number.isFinite(Number(selected.revenue_per_kwacha)) ? `${(Number(selected.revenue_per_kwacha) * 100).toFixed(2)}%` : '';
+      currentServiceBalance = null;
+      $('receiptPanel').hidden = true;
       clearMessage();
+      updateServiceCredit();
+      if (selected) {
+        const selectedId = service.value;
+        fetch(`${API_BASE}/dashboard/service-summary`)
+          .then(response => { if (!response.ok) throw new Error('Could not load service limits'); return response.json(); })
+          .then(services => {
+            if (service.value !== selectedId) return;
+            const summary = services.find(item => item.service === selected.name);
+            if (summary) currentServiceBalance = {name: summary.service, limit: Number(summary.monthly_limit), remaining: Number(summary.amount_remaining)};
+            updateServiceCredit();
+          })
+          .catch(() => {
+            if (service.value === selectedId) $('serviceCreditNote').textContent = 'Live limit check unavailable; the server will validate before saving.';
+          });
+      }
     });
-    amount.addEventListener('input', updateCalculation);
+    $('printReceipt').addEventListener('click', () => window.print());
+    amount.addEventListener('input', () => { $('receiptPanel').hidden = true; updateCalculation(); });
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
@@ -107,6 +159,12 @@
         form.reportValidity();
         return;
       }
+      if (currentServiceBalance && Number(amount.value) > currentServiceBalance.remaining) {
+        showMessage('danger', `This amount exceeds the remaining ${currentServiceBalance.name} monthly limit of ${money(currentServiceBalance.remaining)}.`);
+        return;
+      }
+      const selectedBooth = boothRecords.find(item => String(item.id) === booth.value);
+      const selectedService = serviceRecords.find(item => String(item.id) === service.value);
       submit.disabled = true;
         submit.setAttribute('aria-busy', 'true');
         submit.querySelector('.button-label').textContent = 'Saving…';
@@ -119,9 +177,10 @@
         if (!response.ok) throw new Error(data.error || 'The transaction could not be saved. Please review the details.');
         const reference = data.id || data.transaction_id;
         $('transactionId').value = reference || '';
+        showReceipt(data, selectedBooth, selectedService);
         showMessage('success', `Transaction recorded successfully${reference ? ` · Reference ${reference}` : ''}.`);
         form.reset();
-        locationInput.value = ''; rate.value = ''; resetService(); updateCalculation();
+        locationInput.value = ''; rate.value = ''; currentServiceBalance = null; $('serviceCreditNote').textContent = 'Remaining service credit will appear after selection.'; resetService(); updateCalculation();
         $('transactionId').value = reference || '';
       } catch (error) {
         showMessage('danger', error.message === 'Failed to fetch' ? 'Could not reach the server. Start the Flask backend and try again. No transaction was saved.' : error.message);

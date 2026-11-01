@@ -1,8 +1,21 @@
 import re
+from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 MONEY_QUANTUM = Decimal("0.01")
 MAX_TRANSACTION_AMOUNT = Decimal("9999999999.99")
+
+
+def current_month_window():
+    """Return naive local database timestamps covering the current month."""
+    # SQLite CURRENT_TIMESTAMP stores UTC values without timezone metadata.
+    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    if start.month == 12:
+        end = start.replace(year=start.year + 1, month=1)
+    else:
+        end = start.replace(month=start.month + 1)
+    return start, end
 
 
 def next_transaction_id(last_id: str | None) -> str:

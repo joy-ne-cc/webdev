@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request, current_app
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.extensions import db
 from app.models import Transaction, MobileBooth, Service, BoothService
-from app.utils import next_transaction_id, parse_transaction_amount, apply_tax
+from app.utils import current_month_window, next_transaction_id, parse_transaction_amount, apply_tax
 
 bp = Blueprint("transactions", __name__, url_prefix="/api/transactions")
 
@@ -60,6 +61,26 @@ def create_transaction():
         amount = parse_transaction_amount(raw_amount)
     except ValueError as error:
         return jsonify({"error": str(error)}), 400
+
+    month_start, month_end = current_month_window()
+    used = (
+        db.session.query(func.coalesce(func.sum(Transaction.amount), 0))
+        .filter(
+            Transaction.service_id == service_id,
+            Transaction.created_at >= month_start,
+            Transaction.created_at < month_end,
+        )
+        .scalar()
+    )
+    remaining = service.monthly_limit - used
+    if amount > remaining:
+        return jsonify({
+            "error": f"This transaction exceeds the remaining {service.name} monthly limit.",
+            "service": service.name,
+            "monthly_limit": float(service.monthly_limit),
+            "used": float(used),
+            "amount_remaining": float(remaining),
+        }), 409
 
     last = Transaction.query.order_by(Transaction.id.desc()).first()
     new_id = next_transaction_id(last.id if last else None)

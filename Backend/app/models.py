@@ -91,4 +91,5 @@ class Transaction(db.Model):
             # data bar (requirement d): tax as a share of the original amount,
             # 0-100, so the frontend can render it directly as a bar width %
             "tax_share_pct": round(float(self.tax_amount) / float(self.amount) * 100, 2) if self.amount else 0,
+            "created_at": f"{self.created_at.isoformat(timespec='seconds')}Z" if self.created_at else None,
         }

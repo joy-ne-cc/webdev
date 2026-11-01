@@ -5,6 +5,13 @@
   const money = value => `K${Number(value || 0).toLocaleString('en-ZM', {maximumFractionDigits:0})}`;
   const money2 = value => `K${Number(value || 0).toLocaleString('en-ZM', {minimumFractionDigits:2,maximumFractionDigits:2})}`;
   const safePercent = (value, max) => max > 0 ? Math.max(0, Math.min(100, Math.round(value / max * 100))) : 0;
+  const localCalendarDay = value => {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) return '';
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  };
+  let allTransactions = [];
+  let demoTransactionList = false;
 
   async function getJson(path) {
     const response = await fetch(`${API_BASE}${path}`);
@@ -136,24 +143,39 @@
       const value=document.createElement('div');value.className='tax-row-value';value.textContent=money2(tax);row.append(label,track,value);container.appendChild(row);
     });
   }
+  function getFilteredTransactions(transactions) {
+    const from = $('filterFrom').value, to = $('filterTo').value;
+    const boothFilter = $('filterBooth').value, serviceFilter = $('filterService').value;
+    return [...transactions].filter(item => {
+      const day = localCalendarDay(item.created_at);
+      return (!boothFilter || item.booth === boothFilter)
+        && (!serviceFilter || item.service === serviceFilter)
+        && (!from || (day && day >= from))
+        && (!to || (day && day <= to));
+    }).sort((a, b) => {
+      const aDate = Date.parse(a.created_at || ''), bDate = Date.parse(b.created_at || '');
+      if (Number.isFinite(aDate) && Number.isFinite(bDate) && aDate !== bDate) return bDate - aDate;
+      return String(b.id || '').localeCompare(String(a.id || ''), undefined, {numeric:true});
+    });
+  }
   function renderRecent(transactions, demo = false) {
     const body = $('recent-transactions-body');
     body.replaceChildren();
     if (demo) {
       const row = document.createElement('tr');
-      addCell(row, 'Recent transaction details are not included in the demo summary.', 'table-loading');
-      row.firstChild.colSpan = 6;
+      addCell(row, 'Transaction details appear when the Flask backend is connected.', 'table-loading');
+      row.firstChild.colSpan = 7;
       body.appendChild(row);
+      $('filterResultCount').textContent = 'Live transaction records unavailable';
       return;
     }
-    const recent = [...transactions].sort((a, b) => {
-      const aDate = Date.parse(a.created_at || ''), bDate = Date.parse(b.created_at || '');
-      if (Number.isFinite(aDate) && Number.isFinite(bDate) && aDate !== bDate) return bDate - aDate;
-      return String(b.id || '').localeCompare(String(a.id || ''), undefined, {numeric:true});
-    }).slice(0, 8);
-    recent.forEach(item => {
+    const filtered = getFilteredTransactions(transactions);
+    $('filterResultCount').textContent = `${filtered.length.toLocaleString('en-ZM')} of ${transactions.length.toLocaleString('en-ZM')} records`;
+    filtered.forEach(item => {
       const row = document.createElement('tr');
       addCell(row, item.id || '—', 'transaction-id');
+      const timestamp = item.created_at ? new Date(item.created_at) : null;
+      addCell(row, timestamp && Number.isFinite(timestamp.getTime()) ? timestamp.toLocaleString() : '—');
       addCell(row, `${item.booth || '—'}${item.location ? ` · ${item.location}` : ''}`);
       addCell(row, item.service || '—');
       addCell(row, money2(item.amount));
@@ -161,10 +183,10 @@
       addCell(row, money2(item.amount_after_tax), 'amount-net');
       body.appendChild(row);
     });
-    if (!recent.length) {
+    if (!filtered.length) {
       const row = document.createElement('tr');
       addCell(row, 'No transactions have been recorded yet.', 'table-loading');
-      row.firstChild.colSpan = 6;
+      row.firstChild.colSpan = 7;
       body.appendChild(row);
     }
   }
@@ -178,6 +200,65 @@
     });
   }
   function renderSummary(revenue,capital,transactionCount){$('total-revenue').textContent=money(revenue);$('total-capital').textContent=money(capital);$('total-transactions').textContent=Number(transactionCount).toLocaleString('en-ZM');}
+  function fillFilterOptions(id, values, label) {
+    const select = $(id);
+    select.replaceChildren(new Option(label, ''));
+    [...new Set(values.filter(Boolean))].sort().forEach(value => select.add(new Option(value, value)));
+  }
+  function exportFilteredTransactions() {
+    if (demoTransactionList || !allTransactions.length) {
+      $('dashboardMessage').className = 'alert alert-info';
+      $('dashboardMessage').textContent = 'Connect the Flask backend and load transaction records before exporting.';
+      return;
+    }
+    const columns = ['Transaction ID','Date recorded','Booth','Location','Service','Amount','Tax','After tax'];
+    const quote = value => `"${String(value ?? '').replaceAll('"', '""')}"`;
+    const rows = getFilteredTransactions(allTransactions).map(item => [item.id,item.created_at,item.booth,item.location,item.service,item.amount,item.tax_amount,item.amount_after_tax]);
+    const csv = '\uFEFF' + [columns, ...rows].map(row => row.map(quote).join(',')).join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8'}));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `wina-transactions-${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+  async function resetDemoData(session) {
+    if (!window.confirm('Restore the original seeded demo data? This clears transactions added since the last reset.')) return;
+    if (window.prompt('Type RESET to confirm restoring the seeded presentation data.') !== 'RESET') return;
+    const password = window.prompt('Enter the admin password to continue.');
+    if (password === null) return;
+    const button = $('resetDemoData');
+    button.disabled = true;
+    button.textContent = 'Restoring…';
+    try {
+      const response = await fetch(`${API_BASE}/demo/reset`, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({email:session.username || session.email || '', password})
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'The demo data could not be restored.');
+      window.alert(`Demo data restored with ${data.seeded.transactions} seeded transactions.`);
+      window.location.reload();
+    } catch (error) {
+      window.alert(error.message === 'Failed to fetch' ? 'Could not reach the local Flask backend. Start it and try again.' : error.message);
+      button.disabled = false;
+      button.textContent = 'Reset demo data';
+    }
+  }
+  function setupAdminActions(session) {
+    ['filterBooth','filterService','filterFrom','filterTo'].forEach(id => $(id).addEventListener('input', () => renderRecent(allTransactions, demoTransactionList)));
+    $('clearTransactionFilters').addEventListener('click', () => {
+      $('filterBooth').value = '';
+      $('filterService').value = '';
+      $('filterFrom').value = '';
+      $('filterTo').value = '';
+      renderRecent(allTransactions, demoTransactionList);
+    });
+    $('exportTransactions').addEventListener('click', exportFilteredTransactions);
+    $('resetDemoData').addEventListener('click', () => resetDemoData(session));
+  }
   async function initDashboard(){
     try {
       const [totals,serviceSummary,boothRevenue,transactions,boothsResponse,servicesResponse] = await Promise.all([
@@ -186,9 +267,13 @@
       const services=serviceSummary.map(item=>({...item,service:item.service}));
       const booths=boothRevenue.map(item=>({...item,booth:item.booth,location:(boothsResponse.find(b=>b.name===item.booth)||{}).location||''}));
       const boothNames=boothsResponse.map(b=>b.name); const serviceNames=servicesResponse.map(s=>s.name);
+      allTransactions=transactions;demoTransactionList=false;
+      fillFilterOptions('filterBooth',boothNames,'All booths');fillFilterOptions('filterService',serviceNames,'All services');
       renderSummary(totals.total_revenue,totals.total_capital,transactions.length);
       renderServiceLimits(services);renderBooths(booths);renderFrequency(transactions,boothNames,serviceNames);renderRecent(transactions);renderTax(services);renderPie(totals.total_revenue,totals.total_capital);
     } catch (error) {
+      allTransactions=[];demoTransactionList=true;
+      fillFilterOptions('filterBooth',[],'All booths');fillFilterOptions('filterService',[],'All services');
       const data=window.dashboardData;
       if (!data) { $('dashboardMessage').className='alert alert-danger';$('dashboardMessage').textContent='Dashboard data could not be loaded. Start the Flask backend and refresh this page.';return; }
       $('dashboardMessage').className='alert alert-info';$('dashboardMessage').textContent='Showing illustrative demo figures because the Flask API is unavailable. Start the backend to view live database totals.';
@@ -216,7 +301,7 @@
     $('signOut').addEventListener('click',()=>{try{localStorage.removeItem('wb_demo_session')}catch{}});
     document.querySelectorAll('a[href^="dashboard.html"]').forEach(link=>link.href=`dashboard.html?role=${session.role}`);
     document.querySelectorAll('a[href^="index.html"]').forEach(link=>link.href=`index.html?role=${session.role}`);
-    if(isAdmin)initDashboard();else initAgentServiceLimits();
+    if(isAdmin){setupAdminActions(session);initDashboard();}else initAgentServiceLimits();
   }
   document.addEventListener('DOMContentLoaded',configureWorkspace);
 })();

@@ -16,11 +16,12 @@ def create_app(config_class=Config):
         supports_credentials=False,
     )
 
-    from app.routes import booths, services, transactions, dashboard
+    from app.routes import booths, services, transactions, dashboard, demo
     app.register_blueprint(booths.bp)
     app.register_blueprint(services.bp)
     app.register_blueprint(transactions.bp)
     app.register_blueprint(dashboard.bp)
+    app.register_blueprint(demo.bp)
 
     @app.get("/api/health")
     def health():
