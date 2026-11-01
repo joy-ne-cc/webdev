@@ -5,6 +5,14 @@
   const $ = id => document.getElementById(id);
 
   document.addEventListener('DOMContentLoaded', () => {
+    let session=null;
+    try{session=JSON.parse(localStorage.getItem('wb_demo_session')||'null')}catch{}
+    const roleFromUrl=new URLSearchParams(location.search).get('role');
+    if(!session&&['agent','admin'].includes(roleFromUrl))session={role:roleFromUrl,name:roleFromUrl==='admin'?'Admin':'Agent'};
+    if(!session||!['agent','admin'].includes(session.role)){location.replace('login.html');return;}
+    $('userAvatar').textContent=(session.name||session.username||session.role).trim().slice(0,2).toUpperCase();
+    $('signOut').addEventListener('click',()=>{try{localStorage.removeItem('wb_demo_session')}catch{}});
+    document.querySelectorAll('a[href^="dashboard.html"]').forEach(link=>link.href=`dashboard.html?role=${session.role}`);
     const form = $('transactionForm');
     if (!form) return;
     const booth = $('booth'), service = $('service'), location = $('location');

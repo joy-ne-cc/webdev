@@ -1,78 +1,70 @@
-# Wina Bwangu API
+# Wina Bwangu Flask API
 
-Flask backend for the Wina Bwangu web app case study. Covers: server setup,
-database, seeding the 308 transactions, and all GET/POST endpoints the
-frontend needs.
+This Flask API provides booth and service data, records transactions, and supplies the figures used by the dashboard. Its SQLite database defaults to `Backend/wina_bwangu.db` and is created from `seed_data/*.csv`.
 
-## Setup
+## Run on Windows
 
-```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-python seed_db.py               # creates wina_bwangu.db and loads all seed data
-python run.py                   # starts the server on http://localhost:5000
+From PowerShell:
+
+```powershell
+cd Backend
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python seed_db.py
+python run.py
 ```
 
-Re-run `python seed_db.py --reset` any time you want to wipe and reload from
-`seed_data/*.csv`.
+The API listens on `http://127.0.0.1:5000`. For local development, serve the `Frontend` folder with an HTTP server (for example, VS Code Live Server on port 5500) and open `login.html` from that server.
 
-## Folder structure
+On macOS or Linux, create and activate a virtual environment with `python3 -m venv .venv` and `source .venv/bin/activate`, then use the same pip, seed, and run commands.
 
-```
-app/
-  __init__.py       # app factory — creates the Flask app, registers routes
-  config.py         # DB URI + TAX_RATE
-  extensions.py     # the shared db = SQLAlchemy() instance
-  models.py         # Location, MobileBooth, Service, BoothService, Transaction
-  utils.py          # transaction ID generation + tax calculation
-  routes/
-    booths.py       # GET /api/booths, GET /api/booths/<id>/services
-    services.py     # GET /api/services
-    transactions.py # GET/POST /api/transactions
-    dashboard.py     # all the dashboard aggregate endpoints
-seed_data/           # booths.csv, services.csv, booth_services.csv, transactions.csv
-seed_db.py           # loads seed_data/ into the database
-run.py                # entry point
-```
+Run `python seed_db.py --reset` only when you want to drop and recreate the database from the seed CSV files.
 
-## Endpoints
+## Configuration
+
+| Environment variable | Default | Purpose |
+|---|---|---|
+| `DATABASE_URL` | SQLite file at `Backend/wina_bwangu.db` | SQLAlchemy database URL |
+| `TAX_RATE` | `0.10` | Tax rate from 0 through 1 (10% by default) |
+| `CORS_ORIGINS` | Local development origins and `null` | Comma-separated browser origins allowed to call `/api/*` |
+| `FLASK_HOST` | `127.0.0.1` | Address used by the development server |
+| `PORT` | `5000` | Development server port |
+| `FLASK_DEBUG` | `0` | Set to `1` to enable Flask debug mode locally |
+
+For example, if the frontend is served from port 3000, add `http://localhost:3000` and `http://127.0.0.1:3000` to `CORS_ORIGINS`. CORS only controls which browser origins can read API responses; it does not authenticate users or protect API data.
+
+## API endpoints
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/booths` | Booth dropdown (id, name, location) |
-| GET | `/api/booths/<id>/services` | Service dropdown, filtered to that booth — dropdown chaining |
-| GET | `/api/services` | Full service catalog (monthly limit, revenue/kwacha) |
-| GET | `/api/transactions?booth_id=&service_id=` | List/filter transactions |
-| POST | `/api/transactions` | Create a transaction — body `{booth_id, service_id, amount}` |
-| GET | `/api/dashboard/service-summary` | Cumulative total + amount remaining, per service |
-| GET | `/api/dashboard/booth-revenue` | Cumulative revenue, per booth |
-| GET | `/api/dashboard/frequency` | Transaction count per booth + service |
-| GET | `/api/dashboard/totals` | `{total_revenue, total_capital}` |
-| GET | `/api/dashboard/pie` | Same totals, shaped for a pie chart |
-| GET | `/api/health` | Sanity check |
+| GET | `/api/health` | Check that the API is responding |
+| GET | `/api/booths` | List booths and locations |
+| GET | `/api/booths/<id>/services` | List services offered by a booth |
+| GET | `/api/services` | List the service catalog and rates |
+| GET | `/api/transactions?booth_id=&service_id=` | List transactions, optionally filtered by booth or service |
+| POST | `/api/transactions` | Record a transaction |
+| GET | `/api/dashboard/service-summary` | Service totals, monthly limits, and remaining amounts |
+| GET | `/api/dashboard/booth-revenue` | Revenue by booth |
+| GET | `/api/dashboard/frequency` | Transaction counts by booth and service |
+| GET | `/api/dashboard/totals` | Total revenue and capital |
+| GET | `/api/dashboard/pie` | Totals shaped for a pie chart |
 
-`POST /api/transactions` auto-generates the TransactionID, rejects a
-booth/service combination the booth doesn't actually offer (400), and
-returns `tax_share_pct` (0-100) so the frontend can drive a data bar
-directly off it.
+Create a transaction with a JSON object like:
 
-## Assumptions made (flag these in the team report)
+```json
+{"booth_id":1,"service_id":1,"amount":125.50}
+```
 
-1. **Tax rate**: the brief asks for "Transaction Amount after Tax" but never
-   states a rate. Defaulted to **10%** in `app/config.py` (`TAX_RATE`) —
-   change it there, or override with the `TAX_RATE` env var, once you have
-   the real figure.
-2. **"Monthly" cumulative totals**: Appendix 1 has no per-transaction date
-   column — all 308 rows are described as one month (Feb 2021). Cumulative
-   totals are therefore computed across *all* seeded transactions. If a real
-   date field gets added later, `service-summary` and `booth-revenue` should
-   filter by month.
-3. **Total capital**: interpreted as the sum of every service's monthly
-   limit (i.e. the total float the company needs available). Adjust
-   `dashboard.py: totals()` if your lecturer defines this differently.
-4. **Data anomaly**: `WB0000017` (Wina5 / Zamtel Money) is in the source
-   data but Wina5 isn't listed as offering Zamtel Money per the brief. It's
-   seeded as-is (matches the real provided dataset); the same combination
-   is rejected with a 400 if submitted through `POST /api/transactions`,
-   since that endpoint enforces the offering rules.
+The API validates IDs, positive amounts, currency precision, and the booth/service pairing. It calculates tax and returns the generated transaction ID.
+
+## Data assumptions
+
+- The source transaction file describes one month (February 2021) but has no per-transaction date. Dashboard "cumulative" values are totals across the available rows.
+- Total capital is the sum of each service's monthly limit. The assignment brief does not define another formula.
+- The source data includes `WB0000017` for Zamtel Money at Wina5, although the listed booth offerings omit that pair. The seed preserves the source row; new transactions must follow the configured booth offerings.
+- Tax defaults to 10% because the assignment brief does not give a rate. Override `TAX_RATE` when the required value is known.
+
+## Authentication status
+
+The current agent/admin credentials are checked in frontend JavaScript for the prototype. The Flask API does not yet authenticate requests or enforce agent/admin permissions. Keep this API on a trusted local development environment until server-side authentication and authorization are implemented.

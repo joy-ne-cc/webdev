@@ -5,19 +5,19 @@ Usage:
     python seed_db.py --reset    # drop and recreate all tables first
 """
 import csv
-import os
 import sys
+from pathlib import Path
 
 from app import create_app
 from app.extensions import db
 from app.models import Location, MobileBooth, Service, BoothService, Transaction
-from app.utils import apply_tax
+from app.utils import apply_tax, parse_transaction_amount
 
-SEED_DIR = os.path.join(os.path.dirname(__file__), "seed_data")
+SEED_DIR = Path(__file__).resolve().parent / "seed_data"
 
 
 def load_csv(name):
-    with open(os.path.join(SEED_DIR, name), newline="") as f:
+    with (SEED_DIR / name).open(newline="", encoding="utf-8-sig") as f:
         return list(csv.DictReader(f))
 
 
@@ -28,9 +28,20 @@ def seed():
             db.drop_all()
         db.create_all()
 
-        if Location.query.first():
+        seeded_tables = [
+            Location.query.first(),
+            MobileBooth.query.first(),
+            Service.query.first(),
+            BoothService.query.first(),
+            Transaction.query.first(),
+        ]
+        if all(seeded_tables):
             print("Database already has data — skipping seed. Use --reset to reload.")
             return
+        if any(seeded_tables):
+            raise RuntimeError(
+                "Database contains a partial seed. Use --reset to rebuild it from the CSV files."
+            )
 
         # Locations + booths
         booth_rows = load_csv("booths.csv")
@@ -69,9 +80,12 @@ def seed():
 
         # Booth <-> service offerings
         for row in load_csv("booth_services.csv"):
+            booth_id, service_id = int(row["BoothID"]), int(row["ServiceID"])
+            if booth_id not in booth_cache or service_id not in service_cache:
+                raise ValueError(f"Unknown booth or service in booth_services.csv: {row}")
             db.session.add(BoothService(
-                booth_id=int(row["BoothID"]),
-                service_id=int(row["ServiceID"]),
+                booth_id=booth_id,
+                service_id=service_id,
             ))
         db.session.flush()
 
@@ -79,19 +93,26 @@ def seed():
         tax_rate = app.config["TAX_RATE"]
         count = 0
         for row in load_csv("transactions.csv"):
-            amount = float(row["TransactionAmount"])
+            booth_id, service_id = int(row["BoothID"]), int(row["ServiceID"])
+            if booth_id not in booth_cache or service_id not in service_cache:
+                raise ValueError(f"Unknown booth or service in transactions.csv: {row}")
+            amount = parse_transaction_amount(row["TransactionAmount"])
             tax_amount, amount_after_tax = apply_tax(amount, tax_rate)
             db.session.add(Transaction(
                 id=row["TransactionID"],
-                booth_id=int(row["BoothID"]),
-                service_id=int(row["ServiceID"]),
+                booth_id=booth_id,
+                service_id=service_id,
                 amount=amount,
                 tax_amount=tax_amount,
                 amount_after_tax=amount_after_tax,
             ))
             count += 1
 
-        db.session.commit()
+        try:
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
         print(f"Seeded {len(location_cache)} locations, {len(booth_cache)} booths, "
               f"{len(service_cache)} services, {count} transactions.")
 

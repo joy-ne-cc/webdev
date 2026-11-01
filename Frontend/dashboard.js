@@ -140,5 +140,24 @@
       renderSummary(data.summary.totalRevenue,data.summary.totalCapital,transactions.length);renderServiceLimits(services);renderBooths(booths);renderFrequency(transactions,data.frequency.booths,data.frequency.services);renderRecent([],true);renderTax(services);renderPie(data.summary.totalRevenue,data.summary.totalCapital);
     }
   }
-  document.addEventListener('DOMContentLoaded',initDashboard);
+  function configureWorkspace(){
+    let session=null;
+    try{session=JSON.parse(localStorage.getItem('wb_demo_session')||'null')}catch{}
+    const roleFromUrl=new URLSearchParams(location.search).get('role');
+    if(!session&&['agent','admin'].includes(roleFromUrl))session={role:roleFromUrl,name:roleFromUrl==='admin'?'Admin':'Agent'};
+    if(!session||!['agent','admin'].includes(session.role)){location.replace('login.html');return;}
+    const isAdmin=session.role==='admin';
+    document.querySelector('.admin-intro').hidden=!isAdmin;
+    document.querySelector('.agent-intro').hidden=isAdmin;
+    document.querySelector('.agent-workspace').hidden=isAdmin;
+    document.querySelectorAll('.admin-only').forEach(section=>section.hidden=!isAdmin);
+    $('pageRole').textContent=isAdmin?'Admin dashboard':'Agent dashboard';
+    $('roleLabel').textContent=isAdmin?'Full business overview':'Daily booth operations';
+    $('userAvatar').textContent=(session.name||session.username||session.role).trim().slice(0,2).toUpperCase();
+    $('signOut').addEventListener('click',()=>{try{localStorage.removeItem('wb_demo_session')}catch{}});
+    document.querySelectorAll('a[href^="dashboard.html"]').forEach(link=>link.href=`dashboard.html?role=${session.role}`);
+    document.querySelectorAll('a[href^="index.html"]').forEach(link=>link.href=`index.html?role=${session.role}`);
+    if(isAdmin)initDashboard();
+  }
+  document.addEventListener('DOMContentLoaded',configureWorkspace);
 })();

@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, current_app
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from app.extensions import db
 from app.models import Transaction, MobileBooth, Service, BoothService
-from app.utils import next_transaction_id, apply_tax
+from app.utils import next_transaction_id, parse_transaction_amount, apply_tax
 
 bp = Blueprint("transactions", __name__, url_prefix="/api/transactions")
 
@@ -10,11 +11,14 @@ bp = Blueprint("transactions", __name__, url_prefix="/api/transactions")
 def list_transactions():
     """GET /api/transactions — optionally filter with ?booth_id= or ?service_id=."""
     query = Transaction.query
-    booth_id = request.args.get("booth_id", type=int)
-    service_id = request.args.get("service_id", type=int)
-    if booth_id:
+    try:
+        booth_id = _optional_positive_id("booth_id")
+        service_id = _optional_positive_id("service_id")
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
+    if booth_id is not None:
         query = query.filter_by(booth_id=booth_id)
-    if service_id:
+    if service_id is not None:
         query = query.filter_by(service_id=service_id)
     transactions = query.order_by(Transaction.id).all()
     return jsonify([t.to_dict() for t in transactions])
@@ -28,16 +32,23 @@ def create_transaction():
     offers the chosen service (req c / R12), and calculates tax + the data-bar
     percentage (req d).
     """
-    data = request.get_json(silent=True) or {}
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "request body must be a JSON object"}), 400
     booth_id = data.get("booth_id")
     service_id = data.get("service_id")
-    amount = data.get("amount")
+    raw_amount = data.get("amount")
 
-    if not all([booth_id, service_id, amount]):
+    if booth_id is None or service_id is None or raw_amount is None:
         return jsonify({"error": "booth_id, service_id and amount are required"}), 400
+    if (
+        isinstance(booth_id, bool) or not isinstance(booth_id, int) or booth_id <= 0
+        or isinstance(service_id, bool) or not isinstance(service_id, int) or service_id <= 0
+    ):
+        return jsonify({"error": "booth_id and service_id must be positive integers"}), 400
 
-    booth = MobileBooth.query.get(booth_id)
-    service = Service.query.get(service_id)
+    booth = db.session.get(MobileBooth, booth_id)
+    service = db.session.get(Service, service_id)
     if not booth or not service:
         return jsonify({"error": "unknown booth_id or service_id"}), 400
 
@@ -46,11 +57,9 @@ def create_transaction():
         return jsonify({"error": f"{booth.name} does not offer {service.name}"}), 400
 
     try:
-        amount = float(amount)
-        if amount <= 0:
-            raise ValueError
-    except (TypeError, ValueError):
-        return jsonify({"error": "amount must be a positive number"}), 400
+        amount = parse_transaction_amount(raw_amount)
+    except ValueError as error:
+        return jsonify({"error": str(error)}), 400
 
     last = Transaction.query.order_by(Transaction.id.desc()).first()
     new_id = next_transaction_id(last.id if last else None)
@@ -64,7 +73,29 @@ def create_transaction():
         tax_amount=tax_amount,
         amount_after_tax=amount_after_tax,
     )
-    db.session.add(txn)
-    db.session.commit()
+    try:
+        db.session.add(txn)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+        current_app.logger.exception("Transaction insert failed due to a database constraint")
+        return jsonify({"error": "transaction could not be saved; retry the request"}), 409
+    except SQLAlchemyError:
+        db.session.rollback()
+        current_app.logger.exception("Transaction insert failed due to a database error")
+        return jsonify({"error": "transaction could not be saved"}), 500
 
     return jsonify(txn.to_dict()), 201
+
+
+def _optional_positive_id(name):
+    raw_value = request.args.get(name)
+    if raw_value is None:
+        return None
+    try:
+        value = int(raw_value)
+    except ValueError:
+        raise ValueError(f"{name} must be a positive integer") from None
+    if value <= 0:
+        raise ValueError(f"{name} must be a positive integer")
+    return value

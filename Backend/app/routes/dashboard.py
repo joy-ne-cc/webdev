@@ -77,20 +77,24 @@ def totals():
     month. (Assumption — the brief names this figure but doesn't define the
     formula; adjust here if your lecturer means something more specific.)
     """
+    return jsonify(_dashboard_totals())
+
+
+@bp.get("/pie")
+def pie():
+    """Req j: pie chart data for the totals above — ready to hand to any chart lib."""
+    data = _dashboard_totals()
+    return jsonify({
+        "labels": ["Total revenue", "Total capital"],
+        "values": [data["total_revenue"], data["total_capital"]],
+    })
+
+
+def _dashboard_totals():
     total_revenue = (
         db.session.query(func.coalesce(func.sum(Transaction.amount * Service.revenue_per_kwacha), 0))
         .join(Service, Transaction.service_id == Service.id)
         .scalar()
     )
     total_capital = db.session.query(func.coalesce(func.sum(Service.monthly_limit), 0)).scalar()
-    return jsonify({"total_revenue": float(total_revenue), "total_capital": float(total_capital)})
-
-
-@bp.get("/pie")
-def pie():
-    """Req j: pie chart data for the totals above — ready to hand to any chart lib."""
-    data = totals().get_json()
-    return jsonify({
-        "labels": ["Total revenue", "Total capital"],
-        "values": [data["total_revenue"], data["total_capital"]],
-    })
+    return {"total_revenue": float(total_revenue), "total_capital": float(total_capital)}

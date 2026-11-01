@@ -10,11 +10,13 @@ A small Flask and JavaScript system for recording mobile money booth transaction
 4. Start the API with `python run.py`.
 5. In another terminal, serve `Frontend/` with `python -m http.server 8080` and open `http://127.0.0.1:8080/`.
 
-The dashboard and transaction form use the Flask API at `http://127.0.0.1:5000/api`. If the API is unavailable, the dashboard labels its figures as illustrative demo data. The transaction form can show demo booth/service options, but saving still requires the API.
+The dashboard and transaction form use the Flask API at `http://127.0.0.1:5000/api`. If the API is unavailable, the dashboard labels its figures as illustrative demo data. The transaction form can show demo booth/service options, but saving still requires the API. The first visit opens the login page; the prototype credentials are `agent@winabwangu.com` / `password` and `admin@winabwangu.com` / `password`.
+
+The role-specific dashboards and credentials are a frontend demonstration. The API currently does not authenticate requests or enforce roles, so do not use these credentials or API endpoints to protect real records.
 
 ## Project layout
 
-- `Frontend/` contains the two pages, shared styles, and browser scripts.
+- `Frontend/` contains the login and signup screens, transaction entry, role-based dashboards, shared styles, and browser scripts.
 - `Backend/` contains the Flask application, API routes, and seed data.
 - `Data/transactions.csv` is the assignment's flat transaction dataset.
 

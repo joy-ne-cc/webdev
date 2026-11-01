@@ -10,7 +10,11 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
 
     db.init_app(app)
-    CORS(app)  # allows the frontend (different port/origin) to call this API
+    CORS(
+        app,
+        resources={r"/api/*": {"origins": app.config.get("CORS_ORIGINS", Config.CORS_ORIGINS)}},
+        supports_credentials=False,
+    )
 
     from app.routes import booths, services, transactions, dashboard
     app.register_blueprint(booths.bp)

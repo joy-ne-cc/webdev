@@ -11,18 +11,18 @@
 <body>
   <div class="app-shell">
     <aside class="sidebar">
-      <a class="brand" href="dashboard.html" aria-label="Wina Bwangu dashboard"><img class="brand-logo" src="assets/wina-bwangu-logo.svg" alt="Wina Bwangu — Booth Operations"></a>
+      <a class="brand" href="dashboard.html?role=agent" aria-label="Wina Bwangu dashboard"><img class="brand-logo" src="assets/wina-bwangu-logo.svg" alt="Wina Bwangu — Booth Operations"></a>
       <div class="nav-label">WORKSPACE</div>
       <nav class="nav-links" aria-label="Main navigation">
-        <a class="nav-link" href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+        <a class="nav-link" href="dashboard.html?role=agent"><span class="nav-icon">▦</span><span>Dashboard</span></a>
         <a class="nav-link active" href="index.html" aria-current="page"><span class="nav-icon">＋</span><span>New transaction</span><span class="nav-current"></span></a>
       </nav>
       <div class="sidebar-bottom"><div class="sidebar-status"><span class="status-dot"></span><span><strong>Operations workspace</strong><small>Mobile money services</small></span></div><p class="sidebar-foot">SIMPLE. CLEAR. ACCOUNTABLE.</p></div>
     </aside>
     <main class="main-area">
-      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong>New transaction</strong></div><div class="topbar-right"><span class="secure-label"><span class="secure-icon">✓</span> Transaction entry</span><span class="avatar">WB</span></div></header>
+      <header class="topbar"><div class="breadcrumbs"><span>Workspace</span><span class="crumb-slash">/</span><strong>New transaction</strong></div><div class="topbar-right"><span class="secure-label"><span class="secure-icon">✓</span> Transaction entry</span><span class="avatar" id="userAvatar">WB</span><a class="signout-link" href="login.html" id="signOut">Sign out</a></div></header>
       <div class="page-content">
-        <section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-line"></span> TRANSACTION MANAGEMENT</div><h1>Record a transaction<span>.</span></h1><p>Capture booth activity accurately, with the key figures calculated for you.</p></div><a class="text-link" href="dashboard.html">View performance <span aria-hidden="true">↗</span></a></section>
+        <section class="page-intro"><div><div class="eyebrow"><span class="eyebrow-line"></span> TRANSACTION MANAGEMENT</div><h1>Record a transaction<span>.</span></h1><p>Capture booth activity accurately, with the key figures calculated for you.</p></div><a class="text-link" href="dashboard.html?role=agent">View performance <span aria-hidden="true">↗</span></a></section>
         <div id="formMessage" role="status" aria-live="polite"></div>
         <div class="transaction-layout">
           <section class="surface transaction-card" aria-labelledby="details-heading">
@@ -42,7 +42,7 @@
           </section>
           <aside class="side-column">
             <section class="guidance-card"><div class="guidance-icon">↗</div><div class="eyebrow light-eyebrow">QUICK GUIDE</div><h2>Make every entry count.</h2><p>A few checks now help keep booth records consistent and reliable.</p><ol class="guide-list"><li><span>1</span><div><strong>Confirm the booth</strong><small>Use the location where the transaction took place.</small></div></li><li><span>2</span><div><strong>Match the service</strong><small>Only services available at that booth can be selected.</small></div></li><li><span>3</span><div><strong>Review the amount</strong><small>Check the total and estimated tax before saving.</small></div></li></ol><div class="guidance-foot"><span class="status-dot"></span> Amounts are shown in ZMW</div></section>
-            <section class="help-card"><div class="help-symbol">i</div><div><strong>Need the bigger picture?</strong><p>Review service limits and compare performance across all six booths.</p><a href="dashboard.html">Open overview <span>→</span></a></div></section>
+            <section class="help-card"><div class="help-symbol">i</div><div><strong>Need the bigger picture?</strong><p>Return to your workspace to review the dashboard available to your role.</p><a href="dashboard.html?role=agent">Open overview <span>→</span></a></div></section>
           </aside>
         </div>
         <footer class="page-footer"><span>Wina Bwangu <span class="footer-dot">·</span> Booth operations</span><span>Clear records. Better decisions.</span></footer>
