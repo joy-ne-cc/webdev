@@ -7,7 +7,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     let session=null;
     try{session=JSON.parse(localStorage.getItem('wb_demo_session')||'null')}catch{}
-    const roleFromUrl=new URLSearchParams(location.search).get('role');
+    const roleFromUrl=new URLSearchParams(window.location.search).get('role');
     if(!session&&['agent','admin'].includes(roleFromUrl))session={role:roleFromUrl,name:roleFromUrl==='admin'?'Admin':'Agent'};
     if(!session||!['agent','admin'].includes(session.role)){location.replace('login.html');return;}
     $('userAvatar').textContent=(session.name||session.username||session.role).trim().slice(0,2).toUpperCase();
@@ -15,7 +15,7 @@
     document.querySelectorAll('a[href^="dashboard.html"]').forEach(link=>link.href=`dashboard.html?role=${session.role}`);
     const form = $('transactionForm');
     if (!form) return;
-    const booth = $('booth'), service = $('service'), location = $('location');
+    const booth = $('booth'), service = $('service'), locationInput = $('location');
     const rate = $('revenue'), amount = $('amount'), message = $('formMessage');
     const submit = form.querySelector('button[type="submit"]');
     let boothRecords = [];
@@ -34,9 +34,11 @@
     function updateCalculation() {
       const gross = Number.parseFloat(amount.value);
       const valid = Number.isFinite(gross) && gross > 0;
-      $('calcGross').textContent = money(valid ? gross : 0);
-      $('calcTax').textContent = money(valid ? gross * TAX_RATE : 0);
-      $('amountAfterTax').textContent = money(valid ? gross * (1 - TAX_RATE) : 0);
+      const grossCents = valid ? Math.round(gross * 100) : 0;
+      const taxCents = Math.floor(grossCents * TAX_RATE + 0.5);
+      $('calcGross').textContent = money(grossCents / 100);
+      $('calcTax').textContent = money(taxCents / 100);
+      $('amountAfterTax').textContent = money((grossCents - taxCents) / 100);
     }
     function resetService() {
       service.replaceChildren(new Option(booth.value ? 'Loading services…' : 'Choose a booth first', ''));
@@ -65,7 +67,7 @@
     booth.addEventListener('change', async () => {
       clearMessage();
       const selected = boothRecords.find(item => String(item.id) === booth.value);
-      location.value = selected?.location || '';
+      locationInput.value = selected?.location || '';
       resetService();
       if (!selected) return;
       try {
@@ -119,7 +121,7 @@
         $('transactionId').value = reference || '';
         showMessage('success', `Transaction recorded successfully${reference ? ` · Reference ${reference}` : ''}.`);
         form.reset();
-        location.value = ''; rate.value = ''; resetService(); updateCalculation();
+        locationInput.value = ''; rate.value = ''; resetService(); updateCalculation();
         $('transactionId').value = reference || '';
       } catch (error) {
         showMessage('danger', error.message === 'Failed to fetch' ? 'Could not reach the server. Start the Flask backend and try again. No transaction was saved.' : error.message);

@@ -40,6 +40,61 @@
     });
     if (!services.length) body.innerHTML = '<tr><td colspan="5" class="table-loading">No service records available.</td></tr>';
   }
+  function renderAgentServiceLimits(services) {
+    const body = $('agent-service-limits-body');
+    body.replaceChildren();
+    services.forEach(item => {
+      const limit = Number(item.monthly_limit ?? item.monthLimit ?? 0);
+      const used = Number(item.cumulative_total ?? item.cumulativeTotal ?? 0);
+      const remaining = Number(item.amount_remaining ?? (limit - used));
+      const pct = safePercent(used, limit);
+      const row = document.createElement('tr');
+      addCell(row, item.service ?? item.name);
+      addCell(row, money(limit));
+      addCell(row, money(used));
+      addCell(row, money(remaining), pct >= 85 ? 'value-warning' : '');
+      const progressCell = row.insertCell();
+      const track = document.createElement('span');
+      track.className = 'data-bar-track';
+      track.setAttribute('role', 'progressbar');
+      track.setAttribute('aria-valuenow', pct);
+      track.setAttribute('aria-valuemin', '0');
+      track.setAttribute('aria-valuemax', '100');
+      track.setAttribute('aria-label', `${item.service ?? item.name} limit used`);
+      const fill = document.createElement('span');
+      fill.className = `data-bar-fill${pct >= 85 ? ' data-bar-fill--warning' : ''}`;
+      fill.style.width = `${pct}%`;
+      track.appendChild(fill);
+      progressCell.appendChild(track);
+      const label = document.createElement('span');
+      label.className = 'data-bar-label';
+      label.textContent = `${pct}%`;
+      progressCell.appendChild(label);
+      body.appendChild(row);
+    });
+    if (!services.length) body.innerHTML = '<tr><td colspan="5" class="table-loading">No service records available.</td></tr>';
+  }
+  async function initAgentServiceLimits() {
+    try {
+      const services = await getJson('/dashboard/service-summary');
+      renderAgentServiceLimits(services);
+    } catch {
+      const services = window.dashboardData?.services?.map(item => ({
+        service: item.name,
+        monthly_limit: item.monthLimit,
+        cumulative_total: item.cumulativeTotal,
+        amount_remaining: item.monthLimit - item.cumulativeTotal,
+      })) || [];
+      renderAgentServiceLimits(services);
+      if (services.length) {
+        $('dashboardMessage').className = 'alert alert-info';
+        $('dashboardMessage').textContent = 'Showing illustrative service credit because the Flask API is unavailable.';
+      } else {
+        $('dashboardMessage').className = 'alert alert-danger';
+        $('dashboardMessage').textContent = 'Service credit could not be loaded. Start the Flask backend and refresh this page.';
+      }
+    }
+  }
   function renderBooths(booths) {
     const container = $('booth-performance'); container.replaceChildren();
     [...booths].sort((a,b) => Number(b.cumulative_revenue ?? b.cumulativeRevenue ?? 0) - Number(a.cumulative_revenue ?? a.cumulativeRevenue ?? 0)).forEach((item,index) => {
@@ -70,11 +125,14 @@
   }
   function renderTax(services) {
     const container=$('tax-obligations'); container.replaceChildren();
+    const obligations=services.map(item=>Number(item.cumulative_total ?? item.cumulativeTotal ?? 0)*TAX_RATE);
+    const largestObligation=Math.max(0,...obligations);
     services.forEach(item => {
       const name=item.service ?? item.name, used=Number(item.cumulative_total ?? item.cumulativeTotal ?? 0), tax=used*TAX_RATE;
       const row=document.createElement('div');row.className='tax-row';
       const label=document.createElement('div');label.className='tax-row-label';label.textContent=name;
-      const track=document.createElement('div');track.className='tax-track';const fill=document.createElement('div');fill.className='tax-fill';fill.style.width=`${TAX_RATE*100}%`;track.appendChild(fill);
+      const percent=largestObligation?Math.round(tax/largestObligation*100):0;
+      const track=document.createElement('div');track.className='tax-track';track.setAttribute('role','progressbar');track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(percent));track.setAttribute('aria-label',`${name} relative estimated tax obligation`);const fill=document.createElement('div');fill.className='tax-fill';fill.style.width=`${percent}%`;track.appendChild(fill);
       const value=document.createElement('div');value.className='tax-row-value';value.textContent=money2(tax);row.append(label,track,value);container.appendChild(row);
     });
   }
@@ -143,7 +201,7 @@
   function configureWorkspace(){
     let session=null;
     try{session=JSON.parse(localStorage.getItem('wb_demo_session')||'null')}catch{}
-    const roleFromUrl=new URLSearchParams(location.search).get('role');
+    const roleFromUrl=new URLSearchParams(window.location.search).get('role');
     if(!session&&['agent','admin'].includes(roleFromUrl))session={role:roleFromUrl,name:roleFromUrl==='admin'?'Admin':'Agent'};
     if(!session||!['agent','admin'].includes(session.role)){location.replace('login.html');return;}
     const isAdmin=session.role==='admin';
@@ -151,13 +209,14 @@
     document.querySelector('.agent-intro').hidden=isAdmin;
     document.querySelector('.agent-workspace').hidden=isAdmin;
     document.querySelectorAll('.admin-only').forEach(section=>section.hidden=!isAdmin);
+    document.querySelectorAll('.agent-only').forEach(section=>section.hidden=isAdmin);
     $('pageRole').textContent=isAdmin?'Admin dashboard':'Agent dashboard';
     $('roleLabel').textContent=isAdmin?'Full business overview':'Daily booth operations';
     $('userAvatar').textContent=(session.name||session.username||session.role).trim().slice(0,2).toUpperCase();
     $('signOut').addEventListener('click',()=>{try{localStorage.removeItem('wb_demo_session')}catch{}});
     document.querySelectorAll('a[href^="dashboard.html"]').forEach(link=>link.href=`dashboard.html?role=${session.role}`);
     document.querySelectorAll('a[href^="index.html"]').forEach(link=>link.href=`index.html?role=${session.role}`);
-    if(isAdmin)initDashboard();
+    if(isAdmin)initDashboard();else initAgentServiceLimits();
   }
   document.addEventListener('DOMContentLoaded',configureWorkspace);
 })();
